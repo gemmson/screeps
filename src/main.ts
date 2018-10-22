@@ -1,14 +1,64 @@
-import { ErrorMapper } from "utils/ErrorMapper";
+import { towerAttack } from "tower";
+import { roleOutsiderClaimer } from "role.outsider.claimer";
+import { runScreepsRoles, cleanUpMemory, manageSpawning } from "loops";
+import profiler from 'screeps-profiler';
+import { handleLinks } from "linksHandler";
+import { roleUpgrader } from "role.upgrader";
+import { handleTasksAssignment } from "assignments";
+import { roleAttacker } from "role.attacker";
+import { roleRanger } from "role.ranger";
+import { roleTank } from "role.tank";
+import { roleHealer } from "role.healer";
+import { manageSummons } from "summoning.circle";
+
+profiler.enable()
+
+
+const g = (global as any);
+
+
+g["createClaimer"] = function (room: string) {
+    roleOutsiderClaimer.spawn(room)
+}
+g["createAttacker"] = function (room: string, energy: number) {
+    roleAttacker.spawn(energy, room)
+}
+
+g["createUpgrader"] = function (room: string, energy: number) {
+    roleUpgrader.spawn(energy, room)
+}
+
+g["createRanger"] = function (room: string, energy: number) {
+    roleRanger.spawn(energy, room)
+}
+
+g["createTank"] = function (room: string, energy: number) {
+    roleTank.spawn(energy, room)
+}
+
+g["createHealer"] = function (room: string, energy: number) {
+    roleHealer.spawn(energy, room)
+}
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
-export const loop = ErrorMapper.wrapLoop(() => {
-  console.log(`Current game tick is ${Game.time}`);
+export const loop = function () {
+    profiler.wrap(
+        () => {
+            //console.log(`Current game tick is ${Game.time}`);
 
-  // Automatically delete memory of missing creeps
-  for (const name in Memory.creeps) {
-    if (!(name in Game.creeps)) {
-      delete Memory.creeps[name];
-    }
-  }
-});
+            // Automatically delete memory of missing creeps
+            cleanUpMemory();
+
+            // Save colony data to memory
+            Memory["colony"] = {}
+            Memory["map"] = {}
+
+            manageSummons();
+            manageSpawning()
+            towerAttack();
+            handleLinks();
+            handleTasksAssignment();
+            runScreepsRoles();
+        })
+}

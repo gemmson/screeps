@@ -8,6 +8,8 @@ import screeps from "rollup-plugin-screeps";
 
 let cfg;
 const dest = process.env.DEST;
+//DEST = pserver
+// console.log(dest)
 if (!dest) {
   console.log("No destination specified - code will be compiled but not uploaded");
 } else if ((cfg = require("./screeps.json")[dest]) == null) {
@@ -26,7 +28,7 @@ export default {
     clear({ targets: ["dist"] }),
     resolve(),
     commonjs(),
-    typescript({tsconfig: "./tsconfig.json"}),
-    screeps({config: cfg, dryRun: cfg == null})
+    typescript({ tsconfig: "./tsconfig.json" }),
+    screeps({ config: cfg, dryRun: cfg == null })
   ]
 }
