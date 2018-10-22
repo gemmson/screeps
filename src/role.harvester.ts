@@ -86,7 +86,7 @@ export class roleHarvester {
                 }
             }
 
-            if (!closestEnergyTarget || creep.room.memory.stats.numberOfCarriers == 0) {
+            if (!closestEnergyTarget || creep.room.memory.stats.numberOfCarriers == 0 && !creep.room.memory.summoningCircle) {
                 closestEnergyTarget = roleHarvester.findClosestSpawnOrExtension(creep)
             }
 

@@ -117,6 +117,7 @@ export class SummoningCircle implements ISummoningCircle {
         body.push(CARRY)
         body.push(CARRY)
         body.push(CARRY)
+        body.push(CARRY)
 
         const name = getRandomName(`${this.room.name} ${roleSummoner.role}`);
         const creepMemory: SummonerMemory = {

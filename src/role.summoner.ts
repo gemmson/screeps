@@ -22,7 +22,25 @@ export class roleSummoner {
             creep.say("No energy")
             return
         }
-        if (creep.carry.energy == 0) {
+
+        let busy = false
+        if (creep.carry.energy > 0) {
+            if (spawn && spawn.energy < spawn.energyCapacity && spawn.id != energySource.id) {
+                if (debug)
+                    creep.say("Transfer")
+                creep.transfer(spawn, RESOURCE_ENERGY)
+                busy = true
+            } else {
+                const extensionsToFill = extensions.filter(e => e.energy < e.energyCapacity)
+                if (extensionsToFill.length > 0) {
+                    if (debug)
+                        creep.say("Transfer")
+                    creep.transfer(extensionsToFill[0], RESOURCE_ENERGY)
+                    busy = true
+                }
+            }
+        }
+        if (!busy) {
             if (debug)
                 creep.say("Recharge")
             if (energySource != null) {
@@ -32,19 +50,14 @@ export class roleSummoner {
                 creep.say("Invalid s")
             }
         }
-        else {
-            if (spawn && spawn.energy < spawn.energyCapacity && spawn.id != energySource.id) {
-                if (debug)
-                    creep.say("Transfer")
-                creep.transfer(spawn, RESOURCE_ENERGY)
-            } else {
-                const extensionsToFill = extensions.filter(e => e.energy < e.energyCapacity)
-                if (extensionsToFill.length > 0) {
-                    if (debug)
-                        creep.say("Transfer")
-                    creep.transfer(extensionsToFill[0], RESOURCE_ENERGY)
-                }
-            }
+
+        this.refreshMemory(creep)
+    }
+    static refreshMemory(creep: Creep): any {
+        if (Game.time % 100 == 1) {
+            const extensionsInRange = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, { filter: s => s.structureType == STRUCTURE_EXTENSION }) as StructureExtension[]
+            const memory = creep.memory.data as SummonerMemory
+            memory.extensionsIds = extensionsInRange.map(e => e.id)
         }
     }
 };
