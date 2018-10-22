@@ -5,6 +5,7 @@ export interface SummonerMemory {
     extensionsIds: string[]
     energySourceId: string
     spawnId: string
+    targetPos?: RoomPosition
 }
 
 export class roleSummoner {

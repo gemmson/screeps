@@ -103,6 +103,6 @@ interface Source {
   getNumberOfNearbyFreeSpots: () => number
 }
 
-interface RoomTerrain {
-  get: (x: number, y: number) => number
+interface SpawnMemory {
+  allowedDirections?: DirectionConstant[]
 }

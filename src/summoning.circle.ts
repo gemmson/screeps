@@ -10,6 +10,8 @@ export class SummoningCircle implements ISummoningCircle {
     room: Room
     memory: ISummoningCircleMemory
 
+    private readonly allDirections: DirectionConstant[] = [TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT]
+
     constructor(roomName: string) {
         if (!Memory.rooms[roomName].summoningCircle) {
             console.log(`Initializing summoning circle in ${roomName}`)
@@ -91,12 +93,12 @@ export class SummoningCircle implements ISummoningCircle {
             if (s.spawner) {
                 if (s.summoners.length < 2) {
                     //need to spawn summoners, inner first
-                    // fix - spawn only necessary creep or keep them alive or both
                     if (s.summoners.length == 0) {
                         this.spawnSummoner(s, true)
                         recalculate = true
                     } else {
-                        this.spawnSummoner(s, false)
+                        const summonerMemory = s.summoners[0].memory.data as SummonerMemory
+                        this.spawnSummoner(s, !summonerMemory.inner)
                         recalculate = true
                     }
                 }
@@ -109,7 +111,6 @@ export class SummoningCircle implements ISummoningCircle {
 
     private spawnSummoner(s: ISummoningCircleSpawner, inner: boolean): ScreepsReturnCode {
         if (!s.spawner || !this.energySource) {
-            console.log(5)
             return ERR_INVALID_TARGET
         }
         var body = new Array<BodyPartConstant>()
@@ -128,6 +129,11 @@ export class SummoningCircle implements ISummoningCircle {
             spawnId: s.spawner.id
         }
         const spawnDirection = inner ? s.spawner.pos.getDirectionTo(this.heart) : this.heart.pos.getDirectionTo(s.spawner)
+
+        if (!s.spawner.memory.allowedDirections) {
+            s.spawner.memory.allowedDirections = this.allDirections
+        }
+        s.spawner.memory.allowedDirections = _.filter(s.spawner.memory.allowedDirections, d => d != spawnDirection)
 
         const status = s.spawner.spawnCreep(body, name, {
             memory: {

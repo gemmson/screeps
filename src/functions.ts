@@ -98,7 +98,11 @@ export const spawnCreep = function spawnCreep(role: string, body: BodyPartConsta
         freeSpawners = freeSpawners.filter(s => s.energy >= s.energyCapacity * 0.75)
     }
     if (freeSpawners.length > 0) {
-        var status = freeSpawners[0].createCreep(body, name, { role, room: roomName, working: false, homeRoom: freeSpawners[0].room.name });
+        //var status = freeSpawners[0].createCreep(body, name, { role, room: roomName, working: false, homeRoom: freeSpawners[0].room.name });
+        const status = freeSpawners[0].spawnCreep(body, name, {
+            memory: { role, room: roomName, working: false, homeRoom: freeSpawners[0].room.name },
+            directions: freeSpawners[0].memory.allowedDirections
+        })
         if (status == OK) {
             let spawnName = freeSpawners[0].room.name
             Memory["activeSpawners"] = { [spawnName]: true }
