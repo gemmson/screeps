@@ -50,8 +50,6 @@ export const loop = function () {
             // Automatically delete memory of missing creeps
             cleanUpMemory();
 
-            // Save colony data to memory
-            Memory["colony"] = {}
             Memory["map"] = {}
 
             manageSummons();

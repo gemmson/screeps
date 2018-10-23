@@ -19,6 +19,7 @@ interface Memory {
   assignments: Assignment;
   map: RoomMap;
   maxEnergyCapacityInRooms: number
+  allies: string[]
 }
 
 interface RoomMap {
@@ -59,9 +60,13 @@ interface Room {
 interface RoomMemory {
   stats: RoomStats,
   summoningCircle: ISummoningCircleMemory
+  spawns: StructureSpawn[]
 }
 
 interface RoomStats {
+  numberOfCreeps: number
+  previousNumberOfCreeps: number
+  numberOfCreepsHasChanged: boolean
   numberOfCarriers: number
   numberOfHarvesters: number
   numberOfTicksWithFullEnergy: number

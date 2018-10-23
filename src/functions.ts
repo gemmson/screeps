@@ -250,7 +250,10 @@ Room.prototype.calculateStats = function () {
             numberOfTicksWithFullEnergy: 0,
             totalHarvestPower: 1000,
             numberOfCarriers: 0,
-            numberOfHarvesters: 0
+            numberOfHarvesters: 0,
+            numberOfCreeps: 0,
+            previousNumberOfCreeps: 0,
+            numberOfCreepsHasChanged: false
         }
     }
     if (this.energyAvailable === this.energyCapacityAvailable && this.energyCapacityAvailable > 0) {
@@ -260,6 +263,14 @@ Room.prototype.calculateStats = function () {
     else {
         this.memory.stats.numberOfTicksWithFullEnergy = 0
         this.memory.stats.numberOfTicksWithoutFullEnergy++
+    }
+    this.memory.stats.previousNumberOfCreeps = this.memory.stats.numberOfCreeps
+    const numberOfCreeps = this.find(FIND_MY_CREEPS)
+    if (this.memory.stats.numberOfCreeps != numberOfCreeps.length) {
+        this.memory.stats.numberOfCreeps = numberOfCreeps.length
+        this.memory.stats.numberOfCreepsHasChanged = true
+    } else {
+        this.memory.stats.numberOfCreepsHasChanged = false;
     }
     runEveryXTicks(10, () => {
         const harvestersInRoom = _.filter(Game.creeps, c => c.memory.role == harvesterRoleName && c.room.name == this.name)

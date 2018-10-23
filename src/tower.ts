@@ -5,8 +5,8 @@ export const towerAttack = registerFNProfiler(function towerAttack() {
         const room = Game.rooms[roomName]
 
         if (room.controller) {
-            const spawnWithNonEmptyHits = room.find(FIND_MY_SPAWNS, { filter: s => s.hits < s.hitsMax })
-            if (spawnWithNonEmptyHits.length > 0) {
+            const spawnWithNonFullHits = room.find(FIND_MY_SPAWNS, { filter: s => s.hits < s.hitsMax })
+            if (spawnWithNonFullHits.length > 0) {
                 room.controller.activateSafeMode()
             }
         }
@@ -30,6 +30,7 @@ export const towerAttack = registerFNProfiler(function towerAttack() {
                 }
 
             });
+            return
         } else {
             var myCreeps = room.find(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax })
             if (myCreeps.length > 0) {
@@ -44,9 +45,11 @@ export const towerAttack = registerFNProfiler(function towerAttack() {
         const structuresToRepair = _.sortBy(
             room.find(FIND_STRUCTURES, {
                 filter: (s) => (s.structureType != STRUCTURE_WALL
-                    && s.structureType != STRUCTURE_RAMPART)
+                    //&& s.structureType != STRUCTURE_RAMPART
+                )
                     && s.hits + TOWER_POWER_REPAIR < s.hitsMax
                     && s.hits / s.hitsMax <= 0.8
+                    && (s.structureType != STRUCTURE_RAMPART || s.hits < 5000)
             }),
             (s) => s.hits)
 

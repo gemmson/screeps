@@ -115,10 +115,10 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
     }
 
     if (Game.time % 5 == 0) {
-        var ignoreFlags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("attack"))
-        if (ignoreFlags.length > 0) {
-            minNumberOfAttackers = 1
-        }
+        // var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("attack"))
+        // if (flags.length > 0) {
+        //     minNumberOfAttackers = 1
+        // }
         minNumberOfTanks = getMinNumberOfUnitsBasedOnFlag("tank", 2)
         minNumberOfHealers = getMinNumberOfUnitsBasedOnFlag("heal", 5);
         minNumberOfRangers = getMinNumberOfUnitsBasedOnFlag("range", 1);
@@ -129,17 +129,19 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
         const room = Game.rooms[roomName]
         Memory.map[roomName] = "visible"
 
+
         room.calculateStats();
         let visualCurrentLine = 0
         room.visual.text(`Energy: ${room.energyAvailable}/${room.energyCapacityAvailable}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`# of ticks at full/not full energy: ${room.memory.stats.numberOfTicksWithFullEnergy}/${room.memory.stats.numberOfTicksWithoutFullEnergy}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`harvester power: ${room.memory.stats.totalHarvestPower}`, 0, visualCurrentLine++, { align: 'left' })
+        room.visual.text(`number of creeps ${room.memory.stats.numberOfCreeps}`, 0, visualCurrentLine++, { align: 'left' })
 
         if (room.storage) {
             Memory["roomsWithStorage"].push(roomName)
         }
 
-        if (Game.time % 5 != 0) {
+        if (room.memory.stats.previousNumberOfCreeps <= room.memory.stats.numberOfCreeps && Game.time % 50) {
             // save cpu
             continue
         }
@@ -204,11 +206,10 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 && numberOfCarriers < 2 * minimumNumberOfEnergyCarriers) {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (numberOfUpgraders < minNumberOfUpgraders ||
-                ((true || !_.contains(Memory.roomsWithStorage, room.name) || (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000))
-                    && room.memory.stats.numberOfTicksWithFullEnergy > numberOfUpgraders * numberOfTicksWithFullEnergyPerUpgrader + 40
-                    && numberOfUpgraders < 5)
-                || numberOfFullContainers > 1 && numberOfUpgraders < 7) {
+            else if (numberOfUpgraders < minNumberOfUpgraders
+                && room.memory.stats.numberOfTicksWithFullEnergy > numberOfUpgraders * numberOfTicksWithFullEnergyPerUpgrader + 40
+                && numberOfUpgraders < (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000 ? 4 : 1)
+                || numberOfFullContainers > 1 && numberOfUpgraders < 6) {
                 roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 0
@@ -276,8 +277,8 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {
                     Memory["map"][roomName] = "reserved"
                     const numberOfSources = room.find(FIND_SOURCES).length
-                    var ignoreFlags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("ignore") && x.pos.roomName == roomName)
-                    if (Memory.roomsWithStorage.length == 0 || ignoreFlags.length > 0) {
+                    var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("ignore") && x.pos.roomName == roomName)
+                    if (Memory.roomsWithStorage.length == 0 || flags.length > 0) {
                         continue
                     }
 

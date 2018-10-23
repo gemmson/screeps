@@ -74,9 +74,10 @@ export class roleBuilder {
                     sites = allSites
 
                 if (sites.length > 0) {
-                    sites.sort((a, b) => a.pos.getRangeTo(creep.pos) - b.pos.getRangeTo(creep.pos))
-                    sites.sort((a, b) => a.progressTotal - b.progressTotal)
-                    sites.sort((a, b) => b.progress - a.progress);
+                    // sites.sort((a, b) => a.pos.getRangeTo(creep.pos) - b.pos.getRangeTo(creep.pos))
+                    // sites.sort((a, b) => a.progressTotal - b.progressTotal)
+                    // sites.sort((a, b) => b.progress - a.progress);
+                    sites = _.sortByAll(sites, x => -x.progress, x => x.pos.getRangeTo(creep.pos))
                     creep.memory.targetId = sites[0].id
                 }
             }

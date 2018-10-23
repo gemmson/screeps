@@ -103,7 +103,11 @@ export class roleRanger {
                     creep.moveTo(target, { visualizePathStyle: { stroke: '#aaffaa' } });
                 }
                 creep.rangedAttack(target)
-                if (rangeToTarget < 3 || lowHits || (enemyCreep && enemyCreep.getActiveBodyparts(ATTACK) > 0)) {
+                if (rangeToTarget < 3 || lowHits ||
+                    (rangeToTarget < 3
+                        && enemyCreep
+                        && enemyCreep.getActiveBodyparts(ATTACK) > 0
+                        && enemyCreep.getActiveBodyparts(RANGED_ATTACK) == 0)) {
                     //move away - simple way
                     // const directionToFromTargetToCreep = target.pos.getDirectionTo(creep)
                     // creep.move(directionToFromTargetToCreep)

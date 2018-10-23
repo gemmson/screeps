@@ -165,7 +165,9 @@ export class SummoningCircle implements ISummoningCircle {
 
 export function manageSummons() {
     for (const roomName in Game.rooms) {
-        //const room = Game.rooms[roomName]
+        if (roomName != "sim") {
+            return
+        }
         if (SummoningCircle.summoningHeartExistInRoom(roomName)) {
             const summoningCircle = new SummoningCircle(roomName)
             summoningCircle.bindObjects()

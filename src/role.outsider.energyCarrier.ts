@@ -53,9 +53,11 @@ export class roleOutsiderEnergyCarrier {
         }
         else {
 
-            const containers = room.find(FIND_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_CONTAINER && s.store.energy > 0 }) as StructureContainer[]
-            if (containers.length > 0 && creep.memory.working == false) {
-                creep.memory.targetId = _.sortByOrder(containers, (s: StructureContainer) => s.store.energy, "desc")[0].id
+            if (!creep.memory.targetId) {
+                const containers = room.find(FIND_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_CONTAINER && s.store.energy > 0 }) as StructureContainer[]
+                if (containers.length > 0 && creep.memory.working == false) {
+                    creep.memory.targetId = _.sortByOrder(containers, (s: StructureContainer) => s.store.energy, "desc")[0].id
+                }
             }
 
             if (creep.memory.working == false && creep.memory.targetId) {
@@ -75,52 +77,53 @@ export class roleOutsiderEnergyCarrier {
                 }
             }
             else if (creep.memory.working && room.name) {
-                if (!creep.memory.targetId) {
-                    const roomsWithStorage = _.map(Memory.roomsWithStorage, (r) => r)
-                    let closestRoom: string;
-                    // if (roomsWithStorage.find(r => r == creep.memory.homeRoom)) {
-                    //     closestRoom = creep.memory.homeRoom
-                    // } else {
-                    closestRoom = roomsWithStorage[0]
-                    //}
-                    if (roomsWithStorage.length > 0) {
-                        if (roomsWithStorage.length > 1) {
-                            let closestDistance = Game.map.getRoomLinearDistance(creep.room.name, closestRoom)
-                            roomsWithStorage.forEach((roomName) => {
-                                const storage = Game.rooms[roomName].storage
-                                if (storage &&
-                                    creep.room.name
-                                    && Game.rooms[roomName]
-                                    && Game.map.getRoomLinearDistance(creep.room.name, roomName) < closestDistance
-                                    && _.sum(storage.store) < storage.storeCapacity) {
-                                    closestRoom = roomName
-                                }
-                            })
-                        }
-                        const storage = Game.rooms[closestRoom].findStructureOfType<StructureStorage>(STRUCTURE_STORAGE)
-                        if (storage.length > 0) {
-                            creep.memory.targetId = storage[0].id
-                        }
-                    }
-                }
-                //let closestStorage = Game.spawns[spawnName].room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_STORAGE })[0]
                 if (creep.memory.data) {
                     if (!goToRoomByName(creep, creep.memory.homeRoom)) {
                         delete creep.memory.targetId
                     }
-                } else if (creep.memory.targetId) {
-                    let closestStorage = Game.structures[creep.memory.targetId]
-                    if (closestStorage && creep.transfer(closestStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        let status = creep.moveTo(closestStorage, debug ? { visualizePathStyle: { stroke: '#ffffff' }, reusePath: 50, noPathFinding: true } : undefined);
-                        if (status != OK && status != ERR_TIRED) {
-                            if (debug)
-                                creep.say("new path" + status)
-                            creep.moveTo(closestStorage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 10 });
-                        }
-                        if (status == ERR_NO_PATH) {
-                            // creep is lost, go home
-                            goToRoomByName(creep, creep.memory.homeRoom)
-                        }
+                }
+                if (!creep.memory.targetId) {
+                    // const roomsWithStorage = _.map(Memory.roomsWithStorage, (r) => r)
+                    // let closestRoom: string;
+                    // // if (roomsWithStorage.find(r => r == creep.memory.homeRoom)) {
+                    // //     closestRoom = creep.memory.homeRoom
+                    // // } else {
+                    // closestRoom = roomsWithStorage[0]
+                    // //}
+                    // if (roomsWithStorage.length > 0) {
+                    //     if (roomsWithStorage.length > 1) {
+                    //         let closestDistance = Game.map.getRoomLinearDistance(creep.room.name, closestRoom)
+                    //         roomsWithStorage.forEach((roomName) => {
+                    //             const storage = Game.rooms[roomName].storage
+                    //             if (storage &&
+                    //                 creep.room.name
+                    //                 && Game.rooms[roomName]
+                    //                 && Game.map.getRoomLinearDistance(creep.room.name, roomName) < closestDistance
+                    //                 && _.sum(storage.store) < storage.storeCapacity) {
+                    //                 closestRoom = roomName
+                    //             }
+                    //         })
+                    //     }
+                    const storage = Game.rooms[creep.memory.homeRoom].storage
+                    if (storage) {
+                        creep.memory.targetId = storage.id
+                    }
+                }
+            }
+            //let closestStorage = Game.spawns[spawnName].room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_STORAGE })[0]
+            if (creep.memory.targetId) {
+                delete creep.memory.data
+                let closestStorage = Game.structures[creep.memory.targetId]
+                if (closestStorage && creep.transfer(closestStorage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    let status = creep.moveTo(closestStorage, debug ? { visualizePathStyle: { stroke: '#ffffff' }, reusePath: 50, noPathFinding: true } : undefined);
+                    if (status != OK && status != ERR_TIRED) {
+                        if (debug)
+                            creep.say("new path" + status)
+                        creep.moveTo(closestStorage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 10 });
+                    }
+                    if (status == ERR_NO_PATH) {
+                        // creep is lost, go home
+                        goToRoomByName(creep, creep.memory.homeRoom)
                     }
                 }
             }
