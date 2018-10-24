@@ -63,7 +63,8 @@ export class roleAttacker {
             // }
         }
 
-        var enemyBuildings = creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_TOWER })
+        //TODO cache structures
+        var enemyBuildings = creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: (s) => !Memory.allies.includes(s.owner.username) && s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_TOWER })
         if (enemyBuildings.length > 0 && creep.room.controller && !creep.room.controller.safeMode) {
             const closestTower = _.find(enemyBuildings, s => s.structureType == STRUCTURE_TOWER)
             if (closestTower) {
@@ -77,7 +78,7 @@ export class roleAttacker {
             creep.memory.working = true
         }
         else {
-            var enemies = creep.room.find(FIND_HOSTILE_CREEPS)
+            var enemies = creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) })
             if (enemies.length > 0 && creep.room.controller && !creep.room.controller.safeMode) {
                 const enemiesWithHealParts = _.filter(enemies, c => c.getActiveBodyparts(HEAL) > 0)
                 if (enemiesWithHealParts.length > 0) {

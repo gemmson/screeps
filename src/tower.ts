@@ -22,7 +22,7 @@ export const towerAttack = registerFNProfiler(function towerAttack() {
             }
             Memory["message"] = `${message} at ${new Date().toISOString()}`
             towers.forEach(tower => {
-                var enemies = room.find(FIND_HOSTILE_CREEPS);
+                var enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) });
                 if (enemies.length > 0) {
                     var enemyToAttack = _.sortByOrder(enemies, (c: Creep) => c.hits)[0]
                     if (tower.pos.getRangeTo(enemyToAttack) < 15 || tower.energy / tower.energyCapacity > 0.7)

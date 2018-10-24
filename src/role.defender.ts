@@ -65,7 +65,7 @@ export class roleDefender {
         var defendersFlags = _.map(Game.flags, (s) => s).filter((x) => x && x.room && x.room.name == creep.room.name && x.name.startsWith("def"))
         const defendersFlag = defendersFlags.length > 0 ? defendersFlags[0] : null;
 
-        var enemyBuilding = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_SPAWN })
+        var enemyBuilding = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, { filter: (s) => !Memory.allies.includes(s.owner.username) && s.structureType == STRUCTURE_SPAWN })
         // if (!enemyBuilding) {
         //     enemyBuilding = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES)
         // }
@@ -74,7 +74,7 @@ export class roleDefender {
             creep.memory.working = true
         }
         else {
-            var enemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS)
+            var enemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) })
             if (enemy && enemy.room == creep.room && creep.room.controller && (!creep.room.controller.safeMode || creep.room.controller.my)) {
                 creep.memory.working = true;
                 creep.memory.targetId = enemy.id;

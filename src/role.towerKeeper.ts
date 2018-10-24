@@ -1,4 +1,4 @@
-import { rechargeAtClosestEnergySource, createCustomCreep } from "functions";
+import { rechargeAtClosestEnergySource, createCustomCreep, registerFNProfiler } from "functions";
 import { roleRepairer } from "role.repairer";
 
 export class roleTowerKeeper {
@@ -47,11 +47,11 @@ export class roleTowerKeeper {
                     creep.moveTo(targetTower, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1500, maxRooms: 1 });
                 }
             }
-            else if (creep.room.find(FIND_HOSTILE_CREEPS).length == 0) {
+            else if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) }).length == 0) {
                 roleRepairer.run(creep)
             }
         }
     }
 };
 
-// roleTowerKeeper.run = registerFNProfiler(roleTowerKeeper.run, 'roleTowerKeeper.run')
+roleTowerKeeper.run = registerFNProfiler(roleTowerKeeper.run, 'roleTowerKeeper.run')

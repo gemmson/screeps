@@ -13,6 +13,10 @@ import { manageSummons } from "summoning.circle";
 
 profiler.enable()
 
+Memory.allies = [
+    "MiloszeS",
+    "Taedh"
+]
 
 const g = (global as any);
 
