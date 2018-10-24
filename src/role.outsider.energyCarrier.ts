@@ -52,7 +52,6 @@ export class roleOutsiderEnergyCarrier {
             }
         }
         else {
-
             if (!creep.memory.targetId) {
                 const containers = room.find(FIND_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_CONTAINER && s.store.energy > 0 }) as StructureContainer[]
                 if (containers.length > 0 && creep.memory.working == false) {
@@ -61,8 +60,8 @@ export class roleOutsiderEnergyCarrier {
             }
 
             if (creep.memory.working == false && creep.memory.targetId) {
-                const container = Game.getObjectById(creep.memory.targetId) as Structure;
-                if (container.structureType == STRUCTURE_CONTAINER) {
+                const container = Game.getObjectById(creep.memory.targetId) as StructureContainer | StructureStorage | null;
+                if (container && container.structureType == STRUCTURE_CONTAINER && container.store.energy > 0) {
                     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         const status = creep.moveTo(container, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 50, noPathFinding: true });
                         if (status != OK && status != ERR_TIRED) {

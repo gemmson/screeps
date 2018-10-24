@@ -346,6 +346,13 @@ Room.prototype.getNumberOfSpotsNearbySources = function getNumberOfSpotsNearbySo
     return this.find(FIND_SOURCES).reduce((sum, source) => sum + source.getNumberOfNearbyFreeSpots(), 0)
 }
 
+Room.prototype.getSources = function () {
+    if (!this.memory.sourcesIds) {
+        this.memory.sourcesIds = this.find(FIND_SOURCES).map(s => s.id)
+    }
+    return this.memory.sourcesIds.map(s => Game.getObjectById(s) as Source)
+}
+
 function getRandomIndex(array: Array<any>) {
     return Math.round(Math.random() * (array.length - 1));
 }

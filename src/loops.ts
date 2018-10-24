@@ -151,7 +151,9 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             continue;
         }
 
-        const towers = room.findStructureOfType<StructureTower>(STRUCTURE_TOWER);
+        const structures = room.find(FIND_STRUCTURES)
+
+        const towers = structures.filter(s => s.structureType == STRUCTURE_TOWER)
         const numberOfHarvesters = numberOfCreepsInRole(roleHarvester.role, roomName);
         const numberOfUpgraders = numberOfCreepsInRole(roleUpgrader.role, roomName)
         const numberOfBuilders = numberOfCreepsInRole(roleBuilder.role, roomName)
@@ -193,12 +195,12 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             //     if (!roleEnergyCarrier.spawn(room.energyCapacityAvailable, roomName))
             //         roleEnergyCarrier.spawn(room.energyAvailable, roomName)
             // }
-            else if ((room.findStructureOfType<StructureContainer>(STRUCTURE_CONTAINER).length > 0 || room.findStructureOfType<StructureContainer>(STRUCTURE_LINK).length > 0)
+            else if ((structures.some(s => s.structureType == STRUCTURE_CONTAINER) || structures.some(s => s.structureType == STRUCTURE_LINK))
                 && numberOfCarriers == 0
                 && room.memory.stats.numberOfTicksWithoutFullEnergy > 150) {
                 roleCarrier.spawn(room.energyAvailable, roomName)
             }
-            else if ((room.findStructureOfType<StructureContainer>(STRUCTURE_CONTAINER).length > 0 || room.findStructureOfType<StructureContainer>(STRUCTURE_LINK).length > 0)
+            else if ((structures.some(s => s.structureType == STRUCTURE_CONTAINER) || structures.some(s => s.structureType == STRUCTURE_LINK))
                 && numberOfCarriers < minimumNumberOfEnergyCarriers) {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
@@ -207,8 +209,8 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfUpgraders < minNumberOfUpgraders
-                && room.memory.stats.numberOfTicksWithFullEnergy > numberOfUpgraders * numberOfTicksWithFullEnergyPerUpgrader + 40
-                && numberOfUpgraders < (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000 ? 4 : 1)
+                && room.memory.stats.numberOfTicksWithFullEnergy > 40
+                && numberOfUpgraders < (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000 ? 4111 : 1)
                 || numberOfFullContainers > 1 && numberOfUpgraders < 6) {
                 roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
             }
@@ -247,12 +249,12 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             else if ((!room.controller.safeMode || room.controller.safeMode < 100) && defenderCreep && defenderCreep[0] && defenderCreep[0].ticksToLive && (defenderCreep[0].ticksToLive as number) < 200 && numberOfCreepsInRole(roleDefender.role, roomName) <= minimumNumberOfDefenders - towers.length) {
                 roleDefender.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (room.findStructureOfType<StructureWall>(STRUCTURE_WALL).length > 0
+            else if (structures.some(s => s.structureType == STRUCTURE_WALL)
                 && (room.controller.level > 2 || room.memory.stats.numberOfTicksWithFullEnergy > 15)
                 && numberOfCreepsInRole(roleWallRepairer.role, roomName) < minNumberOfWallRepairers) {
                 roleWallRepairer.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (room.findStructureOfType<StructureExtractor>(STRUCTURE_EXTRACTOR).length > 0
+            else if (structures.some(s => s.structureType == STRUCTURE_EXTRACTOR)
                 && numberOfCreepsInRole(roleMiner.role, roomName) < minimumNumberOfMiners
                 && room.terminal && _.sum(room.terminal.store) - room.terminal.store.energy < room.terminal.storeCapacity / 2) {
                 roleMiner.spawn(room.energyCapacityAvailable, roomName)
@@ -276,7 +278,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                     // TODO automatic spawner building
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {
                     Memory["map"][roomName] = "reserved"
-                    const numberOfSources = room.find(FIND_SOURCES).length
+                    const numberOfSources = room.getSources().length
                     var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("ignore") && x.pos.roomName == roomName)
                     if (Memory.roomsWithStorage.length == 0 || flags.length > 0) {
                         continue
