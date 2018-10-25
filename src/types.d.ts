@@ -56,6 +56,7 @@ interface Room {
   getNumberOfSpotsNearbySources(): number
   getSummoningCircle(): ISummoningCircle
   getSources(): Source[]
+  sources: Source[]
 }
 
 interface RoomMemory {
@@ -112,4 +113,9 @@ interface Source {
 
 interface SpawnMemory {
   allowedDirections?: DirectionConstant[]
+}
+
+interface StructureObserver {
+  observing: string | undefined;
+  _observeRoom: (roomName: string) => ScreepsReturnCode
 }

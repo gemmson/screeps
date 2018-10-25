@@ -30,7 +30,7 @@ export const towerAttack = registerFNProfiler(function towerAttack() {
                 }
 
             });
-            return
+            continue
         } else {
             var myCreeps = room.find(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax })
             if (myCreeps.length > 0) {

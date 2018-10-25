@@ -370,3 +370,59 @@ Source.prototype.getNumberOfNearbyFreeSpots = function getNumberOfNearbyFreeSpot
     }
     return numberOfFreeSpots
 }
+
+if (!StructureObserver.prototype._observeRoom) {
+    StructureObserver.prototype._observeRoom = StructureObserver.prototype.observeRoom;
+    StructureObserver.prototype.observeRoom = function (roomName) {
+        if (this.observing)
+            return ERR_BUSY;
+        let observeResult = this._observeRoom.apply(this, roomName);
+        if (observeResult === OK)
+            this.observing = roomName;
+        return observeResult;
+    };
+}
+
+Object.defineProperty(Source.prototype, 'memory', {
+    configurable: true,
+    get: function () {
+        if (_.isUndefined(Memory.sourcesMemory)) {
+            Memory.sourcesMemory = {};
+        }
+        if (!_.isObject(Memory.sourcesMemory)) {
+            return undefined;
+        }
+        return Memory.sourcesMemory[this.id] =
+            Memory.sourcesMemory[this.id] || {};
+    },
+    set: function (value) {
+        if (_.isUndefined(Memory.sourcesMemory)) {
+            Memory.sourcesMemory = {};
+        }
+        if (!_.isObject(Memory.sourcesMemory)) {
+            throw new Error('Could not set source memory');
+        }
+        Memory.sourcesMemory[this.id] = value;
+    }
+});
+
+Object.defineProperty(Room.prototype, 'sources', {
+    get: function (): Source[] {
+        // If we dont have the value stored locally
+        if (!this._sources) {
+            // If we dont have the value stored in memory
+            if (!this.memory._sourceIds) {
+                // Find the sources and store their id's in memory,
+                // NOT the full objects
+                this.memory._sourceIds = (this.find(FIND_SOURCES) as Source[])
+                    .map(source => source.id);
+            }
+            // Get the source objects from the id's in memory and store them locally
+            this._sources = this.memory._sourceIds.map((id: string) => Game.getObjectById(id));
+        }
+        // return the locally stored value
+        return this._sources;
+    },
+    enumerable: false,
+    configurable: true
+});
