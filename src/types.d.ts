@@ -55,7 +55,6 @@ interface Room {
   getTerrain(): RoomTerrain
   getNumberOfSpotsNearbySources(): number
   getSummoningCircle(): ISummoningCircle
-  getSources(): Source[]
   sources: Source[]
 }
 
@@ -63,7 +62,6 @@ interface RoomMemory {
   stats: RoomStats,
   summoningCircle: ISummoningCircleMemory
   spawns: StructureSpawn[]
-  sourcesIds: string[]
 }
 
 interface RoomStats {

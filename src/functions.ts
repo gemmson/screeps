@@ -2,6 +2,8 @@ import profiler from 'screeps-profiler';
 import { maxEnergyForSpawnPerRoom } from "consts";
 import { harvesterRoleName, upgraderRoleName } from 'names';
 
+export const nameof = <T>(name: keyof T) => name;
+
 export function findClosestNonEmptySourceInRoom(creep: Creep): Source | null {
     var sourcesWithEnergy = creep.room.find(FIND_SOURCES, { filter: s => s.energy > 0 })
     return creep.pos.findClosestByPath(sourcesWithEnergy)
@@ -346,13 +348,6 @@ Room.prototype.getNumberOfSpotsNearbySources = function getNumberOfSpotsNearbySo
     return this.find(FIND_SOURCES).reduce((sum, source) => sum + source.getNumberOfNearbyFreeSpots(), 0)
 }
 
-Room.prototype.getSources = function () {
-    if (!this.memory.sourcesIds) {
-        this.memory.sourcesIds = this.find(FIND_SOURCES).map(s => s.id)
-    }
-    return this.memory.sourcesIds.map(s => Game.getObjectById(s) as Source)
-}
-
 function getRandomIndex(array: Array<any>) {
     return Math.round(Math.random() * (array.length - 1));
 }
@@ -406,7 +401,7 @@ Object.defineProperty(Source.prototype, 'memory', {
     }
 });
 
-Object.defineProperty(Room.prototype, 'sources', {
+Object.defineProperty(Room.prototype, nameof<Room>("sources"), {
     get: function (): Source[] {
         // If we dont have the value stored locally
         if (!this._sources) {

@@ -278,7 +278,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                     // TODO automatic spawner building
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {
                     Memory["map"][roomName] = "reserved"
-                    const numberOfSources = room.getSources().length
+                    const numberOfSources = room.sources.length
                     var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("ignore") && x.pos.roomName == roomName)
                     if (Memory.roomsWithStorage.length == 0 || flags.length > 0) {
                         continue
