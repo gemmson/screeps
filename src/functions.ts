@@ -403,20 +403,21 @@ Object.defineProperty(Source.prototype, 'memory', {
 
 Object.defineProperty(Room.prototype, nameof<Room>("sources"), {
     get: function (): Source[] {
+        const self = this as Room
         // If we dont have the value stored locally
-        if (!this._sources) {
+        if (!self._sources) {
             // If we dont have the value stored in memory
-            if (!this.memory._sourceIds) {
+            if (!self.memory._sourceIds) {
                 // Find the sources and store their id's in memory,
                 // NOT the full objects
-                this.memory._sourceIds = (this.find(FIND_SOURCES) as Source[])
+                this.memory._sourceIds = self.find(FIND_SOURCES)
                     .map(source => source.id);
             }
             // Get the source objects from the id's in memory and store them locally
-            this._sources = this.memory._sourceIds.map((id: string) => Game.getObjectById(id));
+            self._sources = this.memory._sourceIds.map((id: string) => Game.getObjectById(id));
         }
         // return the locally stored value
-        return this._sources;
+        return self._sources;
     },
     enumerable: false,
     configurable: true

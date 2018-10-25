@@ -49,7 +49,7 @@ interface Creep {
   optimalMoveTo(target: RoomPosition | { pos: RoomPosition }, opts?: MoveToOpts): CreepMoveReturnCode | ERR_NO_PATH | ERR_INVALID_TARGET | ERR_NOT_FOUND;
 }
 
-interface Room {
+interface Room extends RoomInternal {
   findStructureOfType<K extends AnyStructure>(structureType: StructureConstant): K[]
   calculateStats(): void
   getTerrain(): RoomTerrain
@@ -58,10 +58,18 @@ interface Room {
   sources: Source[]
 }
 
-interface RoomMemory {
+interface RoomInternal {
+  _sources: Source[]
+}
+
+interface RoomMemory extends RoomMemoryInternal {
   stats: RoomStats,
   summoningCircle: ISummoningCircleMemory
   spawns: StructureSpawn[]
+}
+
+interface RoomMemoryInternal {
+  _sourceIds: string[]
 }
 
 interface RoomStats {
