@@ -1,7 +1,7 @@
 // example declaration file - remove these and add your own custom typings
 
 // memory extension samples
-interface CreepMemory {
+interface CreepMemory extends CreepMemoryInternal {
   data?: any;
   role: string;
   room?: string;
@@ -9,6 +9,13 @@ interface CreepMemory {
   state?: number;
   targetId?: string;
   working: boolean;
+  step?: number
+  pathToTarget?: PathStep[]
+  pathToHome?: PathStep[]
+}
+
+interface CreepMemoryInternal {
+  _path?: string
 }
 
 interface Memory {
@@ -56,10 +63,12 @@ interface Room extends RoomInternal {
   getNumberOfSpotsNearbySources(): number
   getSummoningCircle(): ISummoningCircle
   sources: Source[]
+  structures: AnyStructure[]
 }
 
 interface RoomInternal {
   _sources: Source[]
+  _structures: AnyStructure[]
 }
 
 interface RoomMemory extends RoomMemoryInternal {
@@ -70,6 +79,7 @@ interface RoomMemory extends RoomMemoryInternal {
 
 interface RoomMemoryInternal {
   _sourceIds: string[]
+  _structureIds: string[]
 }
 
 interface RoomStats {
@@ -115,6 +125,7 @@ interface ISummoningCircleSpawnerMemory {
 
 interface Source {
   getNumberOfNearbyFreeSpots: () => number
+  memory: any
 }
 
 interface SpawnMemory {

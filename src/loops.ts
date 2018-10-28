@@ -18,6 +18,7 @@ import { roleRanger } from 'role.ranger';
 import { roleHealer } from 'role.healer';
 import { roleTank } from 'role.tank';
 import { roleSummoner } from 'role.summoner';
+import { roleOutsiderCarrier } from 'role.outsider.carrier';
 
 export function cleanUpMemory() {
     for (const name in Memory.creeps) {
@@ -74,6 +75,9 @@ export function runScreepsRoles() {
         }
         else if (creep.memory.role == roleOutsiderEnergyCarrier.role) {
             roleOutsiderEnergyCarrier.run(creep);
+        }
+        else if (creep.memory.role == roleOutsiderCarrier.role) {
+            roleOutsiderCarrier.run(creep);
         }
         else if (creep.memory.role == roleOutsiderClaimer.role) {
             roleOutsiderClaimer.run(creep);
@@ -201,11 +205,11 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 roleCarrier.spawn(room.energyAvailable, roomName)
             }
             else if ((structures.some(s => s.structureType == STRUCTURE_CONTAINER) || structures.some(s => s.structureType == STRUCTURE_LINK))
-                && numberOfCarriers < minimumNumberOfEnergyCarriers) {
+                && numberOfCarriers < (room.controller.level > 6 ? 1 : minimumNumberOfEnergyCarriers)) {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfFullContainers > 1
-                && numberOfCarriers < 2 * minimumNumberOfEnergyCarriers) {
+                && numberOfCarriers < 3) {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfUpgraders < minNumberOfUpgraders

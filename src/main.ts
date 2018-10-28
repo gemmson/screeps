@@ -10,6 +10,7 @@ import { roleRanger } from "role.ranger";
 import { roleTank } from "role.tank";
 import { roleHealer } from "role.healer";
 import { manageSummons } from "summoning.circle";
+import { roleOutsiderCarrier } from "role.outsider.carrier";
 
 profiler.enable()
 
@@ -42,6 +43,10 @@ g["createTank"] = function (room: string, energy: number) {
 
 g["createHealer"] = function (room: string, energy: number) {
     roleHealer.spawn(energy, room)
+}
+
+g["createCarrier"] = function () {
+    roleOutsiderCarrier.spawn(300, "W3N19")
 }
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change

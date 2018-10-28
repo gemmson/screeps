@@ -100,7 +100,6 @@ export const spawnCreep = function spawnCreep(role: string, body: BodyPartConsta
         freeSpawners = freeSpawners.filter(s => s.energy >= s.energyCapacity * 0.75)
     }
     if (freeSpawners.length > 0) {
-        //var status = freeSpawners[0].createCreep(body, name, { role, room: roomName, working: false, homeRoom: freeSpawners[0].room.name });
         const status = freeSpawners[0].spawnCreep(body, name, {
             memory: { role, room: roomName, working: false, homeRoom: freeSpawners[0].room.name },
             directions: freeSpawners[0].memory.allowedDirections
@@ -144,7 +143,7 @@ const getFreeSpawners = function getFreeSpawners(energy: number, roomName?: stri
     freeSpawners = _.sortByOrder(freeSpawners, (s: StructureSpawn) => s.energy, "desc")
     if (!roomName)
         return freeSpawners.filter(s => s.room.memory.stats.numberOfTicksWithFullEnergy > 15)
-    freeSpawners = _.sortBy(freeSpawners, (s) => Game.map.getRoomLinearDistance(roomName, s.room.name))
+    //freeSpawners = _.sortBy(freeSpawners, (s) => Game.map.getRoomLinearDistance(roomName, s.room.name))
     return freeSpawners
 }
 
@@ -164,42 +163,25 @@ export function manageWorkingState(creep: Creep, debug: boolean) {
     }
 }
 
-export function goToMemorizedRoom(creep: Creep, debug?: boolean) {
-    if (creep.memory.room && creep.room.name != creep.memory.room) {
-        try {
-            const exitToTargetRoom = creep.room.findExitTo(creep.memory.room)
-            //console.log(`game.room[memory]: ${JSON.stringify(Game.rooms[creep.memory.room])}`)
-            if (exitToTargetRoom != ERR_NO_PATH && exitToTargetRoom != ERR_INVALID_ARGS) {
-                const exitToTargetRoomPosition = creep.pos.findClosestByPath(exitToTargetRoom)
-                if (exitToTargetRoomPosition) {
-                    creep.memory.data = exitToTargetRoomPosition
-                }
-            }
-        } catch (error) {
-            creep.say("Error:Room")
-            console.log(error)
-        }
-        if (creep.memory.data) {
-            const roomPos = creep.memory.data as RoomPosition
-            creep.moveTo(roomPos, { reusePath: 25, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
-        }
-
-        return true
+export const goToMemorizedRoom = registerFNProfiler(function goToMemorizedRoom(creep: Creep, debug?: boolean) {
+    if (!creep.memory.room) {
+        delete creep.memory.data
+        return false
     }
-    // needs test
-    delete creep.memory.data
-    return false;
-}
+    return goToRoomByName(creep, creep.memory.room)
+})
 
-export function goToRoomByName(creep: Creep, roomName: string, debug?: boolean) {
+export const goToRoomByName = registerFNProfiler(function goToRoomByName(creep: Creep, roomName: string, debug?: boolean) {
     if (creep.room.name != roomName) {
         try {
-            const exitToTargetRoom = creep.room.findExitTo(roomName)
-            //console.log(`game.room[memory]: ${JSON.stringify(Game.rooms[creep.memory.room])}`)
-            if (exitToTargetRoom != ERR_NO_PATH && exitToTargetRoom != ERR_INVALID_ARGS) {
-                const exitToTargetRoomPosition = creep.pos.findClosestByPath(exitToTargetRoom)
-                if (exitToTargetRoomPosition) {
-                    creep.memory.data = exitToTargetRoomPosition
+            if (!creep.memory.data || (creep.memory.data as RoomPosition).roomName != creep.room.name) {
+                const exitToTargetRoom = creep.room.findExitTo(roomName)
+                //console.log(`game.room[memory]: ${JSON.stringify(Game.rooms[creep.memory.room])}`)
+                if (exitToTargetRoom != ERR_NO_PATH && exitToTargetRoom != ERR_INVALID_ARGS) {
+                    const exitToTargetRoomPosition = creep.pos.findClosestByPath(exitToTargetRoom) // maybe filter if position is not blocked
+                    if (exitToTargetRoomPosition) {
+                        creep.memory.data = exitToTargetRoomPosition
+                    }
                 }
             }
         } catch (error) {
@@ -208,7 +190,8 @@ export function goToRoomByName(creep: Creep, roomName: string, debug?: boolean) 
         }
         if (creep.memory.data) {
             const roomPos = creep.memory.data as RoomPosition
-            creep.moveTo(roomPos, { reusePath: 25, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
+            const pos = new RoomPosition(roomPos.x, roomPos.y, roomPos.roomName)
+            const status = creep.moveTo(pos, { reusePath: 35, maxRooms: 1, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
         }
 
         return true
@@ -216,7 +199,7 @@ export function goToRoomByName(creep: Creep, roomName: string, debug?: boolean) 
     // needs test
     delete creep.memory.data
     return false;
-}
+})
 
 var names1 = ["Jackson", "Aiden", "Liam", "Lucas", "Noah", "Mason", "Jayden", "Ethan", "Jacob", "Jack", "Caden", "Logan", "Benjamin", "Michael", "Caleb", "Ryan", "Alexander", "Elijah", "James", "William", "Oliver", "Connor", "Matthew", "Daniel", "Luke", "Brayden", "Jayce", "Henry", "Carter", "Dylan", "Gabriel", "Joshua", "Nicholas", "Isaac", "Owen", "Nathan", "Grayson", "Eli", "Landon", "Andrew", "Max", "Samuel", "Gavin", "Wyatt", "Christian", "Hunter", "Cameron", "Evan", "Charlie", "David", "Sebastian", "Joseph", "Dominic", "Anthony", "Colton", "John", "Tyler", "Zachary", "Thomas", "Julian", "Levi", "Adam", "Isaiah", "Alex", "Aaron", "Parker", "Cooper", "Miles", "Chase", "Muhammad", "Christopher", "Blake", "Austin", "Jordan", "Leo", "Jonathan", "Adrian", "Colin", "Hudson", "Ian", "Xavier", "Camden", "Tristan", "Carson", "Jason", "Nolan", "Riley", "Lincoln", "Brody", "Bentley", "Nathaniel", "Josiah", "Declan", "Jake", "Asher", "Jeremiah", "Cole", "Mateo", "Micah", "Elliot"]
 var names2 = ["Sophia", "Emma", "Olivia", "Isabella", "Mia", "Ava", "Lily", "Zoe", "Emily", "Chloe", "Layla", "Madison", "Madelyn", "Abigail", "Aubrey", "Charlotte", "Amelia", "Ella", "Kaylee", "Avery", "Aaliyah", "Hailey", "Hannah", "Addison", "Riley", "Harper", "Aria", "Arianna", "Mackenzie", "Lila", "Evelyn", "Adalyn", "Grace", "Brooklyn", "Ellie", "Anna", "Kaitlyn", "Isabelle", "Sophie", "Scarlett", "Natalie", "Leah", "Sarah", "Nora", "Mila", "Elizabeth", "Lillian", "Kylie", "Audrey", "Lucy", "Maya", "Annabelle", "Makayla", "Gabriella", "Elena", "Victoria", "Claire", "Savannah", "Peyton", "Maria", "Alaina", "Kennedy", "Stella", "Liliana", "Allison", "Samantha", "Keira", "Alyssa", "Reagan", "Molly", "Alexandra", "Violet", "Charlie", "Julia", "Sadie", "Ruby", "Eva", "Alice", "Eliana", "Taylor", "Callie", "Penelope", "Camilla", "Bailey", "Kaelyn", "Alexis", "Kayla", "Katherine", "Sydney", "Lauren", "Jasmine", "London", "Bella", "Adeline", "Caroline", "Vivian", "Juliana", "Gianna", "Skyler", "Jordyn"]
@@ -378,7 +361,7 @@ if (!StructureObserver.prototype._observeRoom) {
     };
 }
 
-Object.defineProperty(Source.prototype, 'memory', {
+Object.defineProperty(Source.prototype, nameof<Source>('memory'), {
     configurable: true,
     get: function () {
         if (_.isUndefined(Memory.sourcesMemory)) {
@@ -422,3 +405,26 @@ Object.defineProperty(Room.prototype, nameof<Room>("sources"), {
     enumerable: false,
     configurable: true
 });
+
+Object.defineProperty(Room.prototype, nameof<Room>("structures"), {
+    get: function (): AnyStructure[] {
+        const self = this as Room
+        if (!self._structures) {
+            if (!self.memory._structureIds) {
+                // need to test which one has better performance
+                this.memory._structureIds = self.find(FIND_STRUCTURES).map(structure => structure.id);
+                //this.memory._structureIds = _.filter(Game.structures, s => s.room && s.room.name == self.name).map(structure => structure.id);
+            }
+            self._structures = this.memory._structureIds.map((id: string) => Game.getObjectById(id));
+        }
+        // return the locally stored value
+        return self._structures;
+    },
+    enumerable: false,
+    configurable: true
+});
+
+export function getPathTo(source: RoomPosition, targets: RoomPosition | { pos: RoomPosition, range: number } | (RoomPosition | { pos: RoomPosition, range: number })[]) {
+    let ret = PathFinder.search(source, targets) // add CostMatrix caching
+    return ret
+}
