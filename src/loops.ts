@@ -145,7 +145,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             Memory["roomsWithStorage"].push(roomName)
         }
 
-        if (room.memory.stats.previousNumberOfCreeps <= room.memory.stats.numberOfCreeps && Game.time % 50) {
+        if (room.memory.stats.previousNumberOfCreeps <= room.memory.stats.numberOfCreeps && Game.time % 50 && room.memory.stats.totalHarvestPower >= 22) {
             // save cpu
             continue
         }
