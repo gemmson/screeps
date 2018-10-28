@@ -292,7 +292,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                         roleOutsiderHarvester.spawn(Math.min(Memory.maxEnergyCapacityInRooms, 1700), roomName)
                     }
                     else if (numberOfCreepsInRole(roleOutsiderEnergyCarrier.role, roomName) < numberOfSources * 2 && Memory.maxEnergyCapacityInRooms) {
-                        roleOutsiderEnergyCarrier.spawn(Math.min(Memory.maxEnergyCapacityInRooms, 2000), roomName)
+                        roleOutsiderEnergyCarrier.spawn(Math.min(Memory.maxEnergyCapacityInRooms, 2500), roomName)
                     }
                 }
             }

@@ -20,15 +20,15 @@ function handleLinksInRooms() {
         if (storageLink) {
             Memory.links[roomName] = storageLink.id;
             links.forEach(link => {
-                if (link.id == storageLink.id) {
-                    // maybe send to controller link
+                if (link.id == storageLink.id || (controllerLink && link.id == controllerLink.id)) {
+
                 }
                 else {
                     if (link.energy > 0 && link.cooldown == 0) {
-                        if (storageLink.energy < storageLink.energyCapacity - 1) {
-                            link.transferEnergy(storageLink)
-                        } else if (controllerLink && controllerLink.id != link.id && controllerLink.energy < controllerLink.energyCapacity - 1) {
+                        if (controllerLink && controllerLink.id != link.id && controllerLink.energy < controllerLink.energyCapacity - 1 && storage.store.energy >= 300000) {
                             link.transferEnergy(controllerLink)
+                        } else if (storageLink.energy < storageLink.energyCapacity - 1) {
+                            link.transferEnergy(storageLink)
                         }
                     }
                 }

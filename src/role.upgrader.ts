@@ -16,7 +16,13 @@ export class roleUpgrader {
         }
 
         if (creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
-            const containerWithEnergy = findClosestStorageOrContainer(creep)
+            const controllerLinks = creep.room.structures.filter(s => s != null && s.structureType == STRUCTURE_LINK && s.room.controller && s.pos.getRangeTo(s.room.controller) <= 3) as StructureLink[]
+            let containerWithEnergy
+            if (controllerLinks.length > 0 && controllerLinks[0].energy > 0) {
+                containerWithEnergy = controllerLinks[0]
+            } else {
+                containerWithEnergy = findClosestStorageOrContainer(creep)
+            }
             if (containerWithEnergy) {
                 const status = creep.withdraw(containerWithEnergy, RESOURCE_ENERGY)
                 if (status == ERR_NOT_IN_RANGE) {
@@ -37,10 +43,9 @@ export class roleUpgrader {
         }
         else {
             if (creep.room.controller) {
-                if (!creep.pos.inRangeTo(creep.room.controller, 2)) {
+                if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(creep.room.controller, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
                 }
-                const status = creep.upgradeController(creep.room.controller)
                 // if (status == 0)
                 //     creep.moveInRandomDirection()
             }
