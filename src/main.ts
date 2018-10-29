@@ -11,6 +11,7 @@ import { roleTank } from "role.tank";
 import { roleHealer } from "role.healer";
 import { manageSummons } from "summoning.circle";
 import { roleOutsiderCarrier } from "role.outsider.carrier";
+import { handleMarketOrders } from "market";
 
 profiler.enable()
 
@@ -49,6 +50,14 @@ g["createCarrier"] = function () {
     roleOutsiderCarrier.spawn(300, "W3N19")
 }
 
+g["enableMarket"] = function () {
+    Memory.marketDisabled = false
+}
+
+g["disableMarket"] = function () {
+    Memory.marketDisabled = true
+}
+
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = function () {
@@ -67,5 +76,6 @@ export const loop = function () {
             handleLinks();
             handleTasksAssignment();
             runScreepsRoles();
+            handleMarketOrders();
         })
 }

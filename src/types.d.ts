@@ -27,6 +27,7 @@ interface Memory {
   map: RoomMap;
   maxEnergyCapacityInRooms: number
   allies: string[]
+  marketDisabled: boolean
 }
 
 interface RoomMap {
