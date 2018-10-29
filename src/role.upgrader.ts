@@ -4,7 +4,7 @@ import { upgraderRoleName } from "names";
 export class roleUpgrader {
     public static role: string = upgraderRoleName
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleUpgrader.role, roomName, true, 3000)
+        createCustomCreep(energy, roleUpgrader.role, roomName, true, 2400)
     }
     /** @param {Creep} creep **/
     public static run(creep: Creep) {
@@ -16,17 +16,25 @@ export class roleUpgrader {
         }
 
         if (creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
-            const controllerLinks = creep.room.structures.filter(s => s != null && s.structureType == STRUCTURE_LINK && s.room.controller && s.pos.getRangeTo(s.room.controller) <= 3) as StructureLink[]
             let containerWithEnergy
-            if (controllerLinks.length > 0 && controllerLinks[0].energy > 0) {
-                containerWithEnergy = controllerLinks[0]
-            } else {
-                containerWithEnergy = findClosestStorageOrContainer(creep)
+            if (!creep.memory.targetId) {
+                const controllerLinks = creep.room.structures.filter(s => s != null && s.structureType == STRUCTURE_LINK && s.room.controller && s.pos.getRangeTo(s.room.controller) <= 3) as StructureLink[]
+                if (controllerLinks.length > 0 && controllerLinks[0].energy > 0) {
+                    containerWithEnergy = controllerLinks[0]
+                } else {
+                    containerWithEnergy = findClosestStorageOrContainer(creep)
+                }
+                if (containerWithEnergy) {
+                    creep.memory.targetId = containerWithEnergy.id
+                }
             }
+            containerWithEnergy = Game.getObjectById(creep.memory.targetId) as StructureContainer | StructureLink | StructureStorage | null
             if (containerWithEnergy) {
                 const status = creep.withdraw(containerWithEnergy, RESOURCE_ENERGY)
                 if (status == ERR_NOT_IN_RANGE) {
                     creep.moveTo(containerWithEnergy, { reusePath: 15, maxOps: 1700 })
+                } else if (status == ERR_NOT_ENOUGH_ENERGY) {
+                    delete creep.memory.targetId
                 }
             }
             else if (creep.room.findStructureOfType<StructureContainer>(STRUCTURE_CONTAINER).length == 0
@@ -42,6 +50,7 @@ export class roleUpgrader {
             }
         }
         else {
+            delete creep.memory.targetId
             if (creep.room.controller) {
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(creep.room.controller, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
