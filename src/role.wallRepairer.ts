@@ -35,7 +35,7 @@ export class roleWallRepairer {
         }
         else {
             // nothing to repair -> act as regular repairer
-            // roleRepairer.run(creep);
+            roleRepairer.run(creep);
         }
     }
 

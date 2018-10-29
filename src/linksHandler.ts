@@ -25,10 +25,12 @@ function handleLinksInRooms() {
                 }
                 else {
                     if (link.energy > 0 && link.cooldown == 0) {
-                        if (controllerLink && controllerLink.id != link.id && controllerLink.energy < controllerLink.energyCapacity - 1 && storage.store.energy >= 300000) {
+                        if (controllerLink && controllerLink.energy < controllerLink.energyCapacity - 5 && storage.store.energy >= 300000) {
                             link.transferEnergy(controllerLink)
-                        } else if (storageLink.energy < storageLink.energyCapacity - 1) {
+                        } else if (storageLink.energy < storageLink.energyCapacity - 5) {
                             link.transferEnergy(storageLink)
+                        } else if (controllerLink && controllerLink.energy < controllerLink.energyCapacity - 5) {
+                            link.transferEnergy(controllerLink)
                         }
                     }
                 }

@@ -30,6 +30,9 @@ export class roleOutsiderEnergyCarrier {
         if (creep.memory.working == true && creep.carry.energy == 0) {
             if (debug)
                 creep.say('Harvest');
+            if (creep.ticksToLive && creep.ticksToLive < 200) {
+                creep.suicide()
+            }
             creep.memory.working = false;
             delete creep.memory.targetId
 
