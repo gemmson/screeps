@@ -4,7 +4,7 @@ import { upgraderRoleName } from "names";
 export class roleUpgrader {
     public static role: string = upgraderRoleName
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleUpgrader.role, roomName, true, 1600)
+        createCustomCreep(energy, roleUpgrader.role, roomName, true, 3000)
     }
     /** @param {Creep} creep **/
     public static run(creep: Creep) {

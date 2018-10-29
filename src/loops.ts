@@ -145,7 +145,9 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             Memory["roomsWithStorage"].push(roomName)
         }
 
-        if (room.memory.stats.previousNumberOfCreeps <= room.memory.stats.numberOfCreeps && Game.time % 50 && room.memory.stats.totalHarvestPower >= 22) {
+        const numberOfUpgraders = numberOfCreepsInRole(roleUpgrader.role, roomName)
+
+        if (room.memory.stats.previousNumberOfCreeps <= room.memory.stats.numberOfCreeps && Game.time % 50 && room.memory.stats.totalHarvestPower >= 22 && numberOfUpgraders > 0) {
             // save cpu
             continue
         }
@@ -159,7 +161,6 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
 
         const towers = structures.filter(s => s.structureType == STRUCTURE_TOWER)
         const numberOfHarvesters = numberOfCreepsInRole(roleHarvester.role, roomName);
-        const numberOfUpgraders = numberOfCreepsInRole(roleUpgrader.role, roomName)
         const numberOfBuilders = numberOfCreepsInRole(roleBuilder.role, roomName)
         const numberOfCarriers = numberOfCreepsInRole(roleCarrier.role, roomName)
         const numberOfAttackers = numberOfCreepsInRole(roleAttacker.role)
@@ -213,9 +214,9 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 roleCarrier.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfUpgraders < minNumberOfUpgraders
-                && room.memory.stats.numberOfTicksWithFullEnergy > 40
-                && numberOfUpgraders < (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000 ? 4111 : 1)
-                || numberOfFullContainers > 1 && numberOfUpgraders < 6) {
+                || (room.memory.stats.numberOfTicksWithFullEnergy > 40
+                    && numberOfUpgraders < (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000 ? 4 : 1)
+                    || numberOfFullContainers > 1 && numberOfUpgraders < 6)) {
                 roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 0

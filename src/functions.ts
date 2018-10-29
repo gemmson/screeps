@@ -410,9 +410,9 @@ Object.defineProperty(Room.prototype, nameof<Room>("structures"), {
     get: function (): AnyStructure[] {
         const self = this as Room
         if (!self._structures) {
-            if (!self.memory._structureIds) {
-                // need to test which one has better performance
+            if (!self.memory._structureIds || Game.time % 100 == 0) {
                 this.memory._structureIds = self.find(FIND_STRUCTURES).map(structure => structure.id);
+                // doesn't work
                 //this.memory._structureIds = _.filter(Game.structures, s => s.room && s.room.name == self.name).map(structure => structure.id);
             }
             self._structures = this.memory._structureIds.map((id: string) => Game.getObjectById(id));
