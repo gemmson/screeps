@@ -126,6 +126,7 @@ export class roleRanger {
         }
     }
 
+    // TODO needs fix for console errors
     private static runAway(creep: Creep, target: Creep | Structure<StructureConstant>, lowHits: boolean) {
         const area = creep.room.lookForAtArea(LOOK_TERRAIN, creep.pos.y - 1, creep.pos.x - 1, creep.pos.y + 1, creep.pos.x + 1, true);
         const plains = area.filter(x => x.terrain == "plain");
@@ -157,6 +158,7 @@ export class roleRanger {
             }
         }
         if (furthestDistance >= minDistance) {
+            // check what happens if x,y is on borders
             creep.moveTo(furthestPos.x, furthestPos.y, { visualizePathStyle: { stroke: '#aaffaa' } });
         }
     }

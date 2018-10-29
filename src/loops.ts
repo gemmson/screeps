@@ -132,7 +132,10 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName]
         Memory.map[roomName] = "visible"
-
+        if (room.sources.length == 0) {
+            // room has no sources, skip it
+            continue;
+        }
 
         room.calculateStats();
         let visualCurrentLine = 0
@@ -152,12 +155,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             continue
         }
 
-        if (room.find(FIND_SOURCES).length == 0) {
-            // room has no sources, skip it
-            continue;
-        }
-
-        const structures = room.find(FIND_STRUCTURES)
+        const structures = room.structures
 
         const towers = structures.filter(s => s.structureType == STRUCTURE_TOWER)
         const numberOfHarvesters = numberOfCreepsInRole(roleHarvester.role, roomName);
@@ -172,12 +170,18 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
         room.memory.stats.numberOfCarriers = numberOfCarriers
         room.memory.stats.numberOfHarvesters = numberOfHarvesters
 
-        const roomSpawner = room.find(FIND_MY_SPAWNS)
-        if (roomSpawner.length > 0 && room.controller && room.controller.my) {
+        const roomSpawners = room.structures.filter(s => s.structureType == STRUCTURE_SPAWN && s.my) as StructureSpawn[]
+        if (roomSpawners.length > 0 && room.controller && room.controller.my) {
             // room has its own spawner
             Memory["map"][roomName] = "my + spawner"
+
+            if (roomSpawners.every(s => s.spawning != null)) {
+                // all spawners are busy, skip this room
+                continue
+            }
+
             var defenderCreep = _.filter(Game.creeps, (c) => c.memory.role == roleDefender.role && c.room.name == roomName);
-            const numberOfFullContainers = room.find(FIND_STRUCTURES, { filter: s => s.structureType == STRUCTURE_CONTAINER && s.store.energy == s.storeCapacity }).length
+            const numberOfFullContainers = room.structures.filter(s => s.structureType == STRUCTURE_CONTAINER && s.store.energy == s.storeCapacity).length
 
             if (_.filter(Game.creeps, (c) => c.room.name == roomName).length < minNumberOfHarvesters) {
                 roleHarvester.spawn(300, roomName)
@@ -242,7 +246,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             else if (numberOfTanks < minNumberOfTanks) {// tankFlags.length) {
                 roleTank.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (room.find(FIND_STRUCTURES, { filter: (s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART })
+            else if (room.structures.filter((s) => s.hits < s.hitsMax && s.structureType != STRUCTURE_WALL && s.structureType != STRUCTURE_RAMPART)
                 && numberOfCreepsInRole(roleRepairer.role, roomName) + numberOfCreepsInRole(roleTowerKeeper.role, roomName) < minNumberOfRepairers) {
                 // structures requiring repair exist in room
                 roleRepairer.spawn(room.energyCapacityAvailable, roomName)
@@ -324,9 +328,9 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
 
     function getMinNumberOfUnitsBasedOnFlag(flagName: string, defaultNumberOfUnits: number): number {
         var numberOfUnits = 0
-        var healFlags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith(flagName));
-        if (healFlags.length > 0) {
-            const flagNameParts = healFlags[0].name.split(";");
+        var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith(flagName));
+        if (flags.length > 0) {
+            const flagNameParts = flags[0].name.split(";");
             if (flagNameParts.length > 1) {
                 numberOfUnits = parseInt(flagNameParts[1]);
             }
