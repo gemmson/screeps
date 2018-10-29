@@ -1,7 +1,8 @@
 import { goToMemorizedRoom, spawnCreep, registerFNProfiler } from "functions";
 
 export class roleCarrier {
-    static role: string = "carrier";
+    static readonly role: string = "carrier";
+    static readonly terminalMaxEnergy = 20000;
     public static spawn(energy: number, roomName?: string): boolean {
         if (energy < 300) {
             return false
@@ -38,37 +39,21 @@ export class roleCarrier {
             delete creep.memory.targetId
         }
         if (creep.memory.working == false && _.sum(creep.carry) == creep.carryCapacity) {
-            creep.memory.working = true;
             if (debug)
                 creep.say('Unload');
+            creep.memory.working = true;
+            delete creep.memory.data
+            delete creep.memory.targetId
         }
 
-        const droppedResourceEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY });
+        // maybe disable that for cpu
+        const droppedResourceEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY && s.amount > 200 });
         if (droppedResourceEnergy && creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
             if (creep.pickup(droppedResourceEnergy) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1500, visualizePathStyle: { stroke: '#ffffff' } });
+                creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1700, visualizePathStyle: { stroke: '#ffffff' } });
             }
             return;
         }
-
-        const tombstones = creep.room.find(FIND_TOMBSTONES, { filter: (s) => _.sum(s.store) > 0 })
-        if (tombstones.length > 0 && _.sum(creep.carry) < creep.carryCapacity) {
-            let closestTombstone = creep.pos.findClosestByRange(tombstones)
-            closestTombstone = closestTombstone ? closestTombstone : tombstones[0]
-
-            if (!creep.memory.working) {
-                creep.memory.data = closestTombstone.id
-                delete creep.memory.targetId
-            }
-        }
-
-        var closestNonEmptyEnergyDeposit = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-            filter: (s) =>
-                (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN)
-                && s.energy < s.energyCapacity,
-            maxRooms: 1,
-            ignoreRoads: true // with equal number of carry and move we can ignore roads
-        })
 
         if (creep.memory.working == false) { // load resources for carry
             if (!creep.memory.data && !creep.memory.targetId) {
@@ -80,36 +65,44 @@ export class roleCarrier {
                     creep.memory.data = closestTombstone.id
                 } else {
                     let containers = Array<Structure>();
-                    containers = creep.room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_LINK && s.energy > 50 && s.id == Memory.links[creep.room.name] }) as Structure[]
-                    if (containers.length > 0) {
-                        // no need to use find, use link closest to storage from memory
-                        //creep.memory.targetId = (creep.pos.findClosestByRange(containers) as StructureLink).id
+                    // find link
+                    //containers = creep.room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_LINK && s.energy > 50 && s.id == Memory.links[creep.room.name] }) as Structure[]
+                    //containers = creep.room.structures.filter(s=>s.structureType == STRUCTURE_LINK && s.energy > 50 && s.id == Memory.links[creep.room.name])
+                    var storageLink = Memory.links[creep.room.name] ? Game.getObjectById<StructureLink>(Memory.links[creep.room.name]) : null
+                    if (storageLink && storageLink.energy > 50) {
                         creep.memory.targetId = Memory.links[creep.room.name]
-                        if (debug)
-                            creep.say("found link")
                     } else {
-                        containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER) && s.store.energy > 50 }) as Structure[]
+                        // no link - find container
+                        //containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_CONTAINER) && s.store.energy > 50 }) as Structure[]
+                        containers = creep.room.structures.filter(s => s.structureType == STRUCTURE_CONTAINER && s.store.energy > 50)
                         // containers = _.sortByOrder(containers, (s: StructureContainer) => s.store.energy, "desc")
                         const closestNonEmptyContainer = creep.pos.findClosestByPath(containers)
                         if (closestNonEmptyContainer) {
-                            containers = [closestNonEmptyContainer]
+                            creep.memory.data = closestNonEmptyContainer.id;
                         }
                     }
                     if (!creep.memory.targetId) {
-                        if (containers.length > 0) {
-                            creep.memory.data = containers[0].id;
-                        } else {
-                            containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE) && s.store.energy > 50 }) as Structure[]
-                            if (containers.length > 0 && closestNonEmptyEnergyDeposit != null) {
-                                creep.memory.targetId = containers[0].id
-                            }
+                        //containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE) && s.store.energy > 50 }) as Structure[]
+                        var storage = creep.room.storage
+                        var nonEmptyEnergyDeposits = creep.room.structures.filter(s =>
+                            (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN)
+                            && s.energy < s.energyCapacity)
+                        // take energy out of storage only if there is other energy deposit to transfer to
+                        if (storage && nonEmptyEnergyDeposits.length > 0) {
+                            creep.memory.targetId = storage.id
                         }
                     }
                 }
-                // creep.memory.data = target
             }
+            // creep.memory.data = target
             // target assigned
+            // Order is
+            // 1. tombstones assigned to .data
+            // 2. link assigned to targetId, no data so the else if will handle that
+            // 3. container assigned to .data, assigned only if there were no tombstones
+            // 4. storage assigned to targetId, no tombstones, links nor containers with energy found
             if (creep.memory.data) {
+                // delete probably not needed as there should be no targetId when data is present
                 delete creep.memory.targetId
                 const container = Game.getObjectById(creep.memory.data) as StructureContainer | Tombstone | null;
                 if (!container) {
@@ -122,60 +115,94 @@ export class roleCarrier {
                     if (status == ERR_NOT_IN_RANGE) {
                         creep.moveTo(container, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
                     }
-                }
-                else {
+                } else { // no more resources, find another target
                     delete creep.memory.data
                 }
             } else if (creep.memory.targetId) {
                 const linkOrStorage = Game.getObjectById(creep.memory.targetId) as StructureLink | StructureStorage | null
                 if (!linkOrStorage
-                    || ("energy" in linkOrStorage && linkOrStorage.energy == 0)
-                    || ("store" in linkOrStorage && linkOrStorage.store.energy == 0)) {
+                    || (linkOrStorage instanceof StructureLink && linkOrStorage.energy == 0)
+                    || (linkOrStorage instanceof StructureStorage && linkOrStorage.store.energy == 0)) {
                     delete creep.memory.targetId
                     return
                 }
+
                 const status = creep.withdraw(linkOrStorage, RESOURCE_ENERGY)
                 if (status == ERR_NOT_IN_RANGE) {
                     creep.moveTo(linkOrStorage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
                 }
             }
         }
-        else if (creep.memory.working) {
-            delete creep.memory.data
-            if (closestNonEmptyEnergyDeposit == null) {
-                closestNonEmptyEnergyDeposit = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-                    filter: (s) =>
-                        (s.structureType == STRUCTURE_STORAGE)
-                        && _.sum(s.store) < s.storeCapacity
-                })
-            }
-            if (closestNonEmptyEnergyDeposit && creep.carry.energy > 0) {
-                const status = creep.transfer(closestNonEmptyEnergyDeposit, RESOURCE_ENERGY)
-                if (status == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(closestNonEmptyEnergyDeposit, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+        else {
+            let closestNonEmptyDeposit: Structure | null = null
+            if (!creep.memory.targetId) {
+                // look for energy deposit
+                closestNonEmptyDeposit = this.findClosestNonEmptyDeposit(creep)
+                if (closestNonEmptyDeposit) {
+                    creep.memory.targetId = closestNonEmptyDeposit.id
                 }
-                return
             }
-            let containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE) && _.sum(s.store) < s.storeCapacity }) as StructureStorage[]
-            if (containers.length > 0) {
-                const resource = _.findKey(creep.carry, (r) => r > 0) as ResourceConstant | undefined
-                if (resource) {
-                    const status = creep.transfer(containers[0], resource)
+
+            if (!closestNonEmptyDeposit && creep.memory.targetId) {
+                closestNonEmptyDeposit = Game.getObjectById<Structure>(creep.memory.targetId)
+            }
+
+            if (closestNonEmptyDeposit) {
+                if (((closestNonEmptyDeposit instanceof StructureExtension || closestNonEmptyDeposit instanceof StructureSpawn)
+                    && closestNonEmptyDeposit.energy == closestNonEmptyDeposit.energyCapacity)
+                    || ((closestNonEmptyDeposit instanceof StructureTerminal)
+                        && (_.sum(closestNonEmptyDeposit.store) == closestNonEmptyDeposit.storeCapacity
+                            || closestNonEmptyDeposit.store.energy >= roleCarrier.terminalMaxEnergy))) {
+                    delete creep.memory.targetId
+                    closestNonEmptyDeposit = this.findClosestNonEmptyDeposit(creep)
+                    if (closestNonEmptyDeposit) {
+                        creep.memory.targetId = closestNonEmptyDeposit.id
+                    }
+                }
+                if (closestNonEmptyDeposit && creep.carry.energy > 0) {
+                    const status = creep.transfer(closestNonEmptyDeposit, RESOURCE_ENERGY)
                     if (status == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(containers[0], { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                        creep.moveTo(closestNonEmptyDeposit, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                    }
+                    return
+                }
+                // let containers = creep.room.find(FIND_STRUCTURES, { filter: (s) => (s.structureType == STRUCTURE_STORAGE) && _.sum(s.store) < s.storeCapacity }) as StructureStorage[]
+                // if (containers.length > 0) {
+                const storage = creep.room.storage
+                if (storage) {
+                    const resource = _.findKey(creep.carry, (r) => r > 0) as ResourceConstant | undefined
+                    if (resource) {
+                        const status = creep.transfer(storage, resource)
+                        if (status == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(storage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                        }
                     }
                 }
             }
             else {
-                // const resource = _.findKey(creep.carry, (r) => r > 0) as ResourceConstant | undefined
-                // if (resource) {
-                //     creep.drop(resource)
-                // }
+                delete creep.memory.targetId
                 if (creep.carry.energy / creep.carryCapacity < 0.3) {
                     creep.memory.working = false
                 }
             }
         }
+    }
+
+    private static findClosestNonEmptyDeposit(creep: Creep) {
+        let closestNonEmptyDeposit: Structure | null = null
+        var nonEmptyEnergyDeposits = creep.room.structures.filter(s =>
+            (s.structureType == STRUCTURE_EXTENSION || s.structureType == STRUCTURE_SPAWN)
+            && s.energy < s.energyCapacity)
+        closestNonEmptyDeposit = nonEmptyEnergyDeposits.length > 0 ? creep.pos.findClosestByPath(nonEmptyEnergyDeposits) : null
+        // no empty extension or spawn to fill, try terminal
+        if (!closestNonEmptyDeposit && creep.room.terminal) {
+            const terminal = creep.room.terminal
+            closestNonEmptyDeposit = terminal.store.energy < roleCarrier.terminalMaxEnergy && _.sum(terminal.store) < terminal.storeCapacity ? terminal : null
+        }
+        if (!closestNonEmptyDeposit && creep.room.storage) {
+            closestNonEmptyDeposit = creep.room.storage
+        }
+        return closestNonEmptyDeposit
     }
 };
 
