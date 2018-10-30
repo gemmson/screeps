@@ -101,6 +101,13 @@ export class SummoningCircle implements ISummoningCircle {
                         this.spawnSummoner(s, !summonerMemory.inner)
                         recalculate = true
                     }
+                } else {
+                    // renew creeps
+                    s.summoners.forEach(c => {
+                        if (c.ticksToLive && c.ticksToLive < 1000 && s.spawner && s.spawner.spawning == null) {
+                            s.spawner.renewCreep(c)
+                        }
+                    });
                 }
             }
         }
