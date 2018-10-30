@@ -23,15 +23,14 @@ export const findClosestStorageOrContainer = function findClosestStorageOrContai
     //         return link
     //     }
     // }
-    const containers = creep.room.find(FIND_STRUCTURES, {
-        filter: (s) => (((
-            s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store.energy > 100)
-            // || Memory.links[creep.room.name] && s.structureType == STRUCTURE_LINK && s.energy > 0 && Memory.links[creep.room.name] == s.id
-        )
-    })
+    const containers = creep.room.structures.filter(s => (((
+        s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER) && s.store.energy > 100)
+        // || Memory.links[creep.room.name] && s.structureType == STRUCTURE_LINK && s.energy > 0 && Memory.links[creep.room.name] == s.id
+    )
+    )
     let links: StructureLink[] = []
     if (Memory.links[creep.room.name]) {
-        const linksResult = creep.room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_LINK && s.energy > 100 && Memory.links[creep.room.name] == s.id }) as StructureLink[]
+        const linksResult = creep.room.structures.filter(s => s.structureType == STRUCTURE_LINK && s.energy > 100 && Memory.links[creep.room.name] == s.id) as StructureLink[]
         if (linksResult)
             links = linksResult
     }
