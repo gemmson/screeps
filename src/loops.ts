@@ -264,6 +264,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 roleWallRepairer.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (structures.some(s => s.structureType == STRUCTURE_EXTRACTOR)
+                && room.mineral && room.mineral.mineralAmount > 0
                 && numberOfCreepsInRole(roleMiner.role, roomName) < minimumNumberOfMiners
                 && room.terminal && _.sum(room.terminal.store) - room.terminal.store.energy < room.terminal.storeCapacity / 2) {
                 roleMiner.spawn(room.energyCapacityAvailable, roomName)

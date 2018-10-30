@@ -65,11 +65,13 @@ interface Room extends RoomInternal {
   getSummoningCircle(): ISummoningCircle
   sources: Source[]
   structures: AnyStructure[]
+  mineral?: Mineral
 }
 
 interface RoomInternal {
   _sources: Source[]
   _structures: AnyStructure[]
+  _mineral?: Mineral
 }
 
 interface RoomMemory extends RoomMemoryInternal {
@@ -81,6 +83,7 @@ interface RoomMemory extends RoomMemoryInternal {
 interface RoomMemoryInternal {
   _sourceIds: string[]
   _structureIds: string[]
+  _mineralId?: string
 }
 
 interface RoomStats {

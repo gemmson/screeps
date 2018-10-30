@@ -1,4 +1,4 @@
-import { goToMemorizedRoom, spawnCreep, registerFNProfiler, goToRoomByName, getPathTo } from "functions";
+import { spawnCreep, registerFNProfiler } from "functions";
 
 export class roleOutsiderCarrier {
     static role: string = "outsiderCarrier";
@@ -124,7 +124,6 @@ export class roleOutsiderCarrier {
                 return
             }
             const pathStep = path[pathStepIndex + 1]
-            const pos = new RoomPosition(pathStep.x, pathStep.y, creep.room.name)
 
             //console.log(`creep pos: ${creep.pos} pos: ${pos}`)
             const status = creep.move(pathStep.direction)

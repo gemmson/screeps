@@ -43,7 +43,7 @@ export class roleWallRepairer {
         var structures = creep.room.find(FIND_STRUCTURES, {
             filter: (s) =>
                 (s.structureType == STRUCTURE_RAMPART || s.structureType == STRUCTURE_WALL)
-                && s.hits < Math.min(s.hitsMax, 10000000)
+                && s.hits < Math.min(s.hitsMax, NUKE_DAMAGE[0] + 1000000)
         }
         );
 

@@ -424,7 +424,19 @@ Object.defineProperty(Room.prototype, nameof<Room>("structures"), {
     configurable: true
 });
 
-export function getPathTo(source: RoomPosition, targets: RoomPosition | { pos: RoomPosition, range: number } | (RoomPosition | { pos: RoomPosition, range: number })[]) {
-    let ret = PathFinder.search(source, targets) // add CostMatrix caching
-    return ret
-}
+Object.defineProperty(Room.prototype, nameof<Room>("mineral"), {
+    get: function (): Mineral | undefined {
+        const self = this as Room
+        if (!self._mineral) {
+            if (!self.memory._mineralId) {
+                const minerals = self.find(FIND_MINERALS)
+                self.memory._mineralId = minerals.length > 0 ? minerals[0].id : undefined
+            }
+            const mineral = Game.getObjectById<Mineral>(self.memory._mineralId)
+            self._mineral = mineral != null ? mineral : undefined
+        }
+        return self._mineral;
+    },
+    enumerable: false,
+    configurable: true
+});
