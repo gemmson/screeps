@@ -86,7 +86,7 @@ export class roleBuilder {
                 if (target) {
                     if ("progress" in target && target.progress < target.progressTotal) {
                         if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(target, { reusePath: 10, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
+                            creep.moveTo(target, { range: 3, reusePath: 10, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
                         }
                     }
                 }

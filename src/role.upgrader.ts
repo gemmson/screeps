@@ -53,7 +53,7 @@ export class roleUpgrader {
             delete creep.memory.targetId
             if (creep.room.controller) {
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                    creep.moveTo(creep.room.controller, { range: 3, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
                 }
                 // if (status == 0)
                 //     creep.moveInRandomDirection()
