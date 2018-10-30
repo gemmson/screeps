@@ -78,6 +78,7 @@ interface RoomMemory extends RoomMemoryInternal {
   stats: RoomStats,
   summoningCircle: ISummoningCircleMemory
   spawns: StructureSpawn[]
+  refreshStructures: boolean
 }
 
 interface RoomMemoryInternal {

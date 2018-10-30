@@ -170,6 +170,36 @@ export const goToMemorizedRoom = registerFNProfiler(function goToMemorizedRoom(c
     return goToRoomByName(creep, creep.memory.room)
 })
 
+export const refreshMemoryStructuresOnBuildEvents = registerFNProfiler(function refreshMemoryStructuresOnBuildEvents() {
+    _.forEach(Game.rooms, room => {
+        room.memory.refreshStructures = false
+        const eventLogs = room.getEventLog()
+        let buildLogs = _.filter(eventLogs, { event: EVENT_BUILD })
+        buildLogs = _.uniq(buildLogs, false, e => (e as any).data.targetId)
+        buildLogs.forEach(e => {
+            //data: {
+            //     targetId: string;
+            //     amount: number;
+            //     energySpent: number;
+            // };
+            // use strong typings when they are correct
+            const data = (e as any).data
+            const constructionSite = Game.getObjectById<ConstructionSite>(data.targetId)
+            if (constructionSite) {
+                if (constructionSite.progress + data.amount >= constructionSite.progressTotal) {
+                    // console.log(`construction site: ${constructionSite.structureType} in ${room.name} will be built on the next tick`)
+                }
+            }
+            else {
+                //console.log(`construction site is null - structure in room ${room.name} is built`)
+                room.memory.refreshStructures = true
+                delete room.memory._structureIds
+            }
+
+        })
+    })
+})
+
 export const goToRoomByName = registerFNProfiler(function goToRoomByName(creep: Creep, roomName: string, debug?: boolean) {
     if (creep.room.name != roomName) {
         try {

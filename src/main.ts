@@ -12,6 +12,7 @@ import { roleHealer } from "role.healer";
 import { manageSummons } from "summoning.circle";
 import { roleOutsiderCarrier } from "role.outsider.carrier";
 import { handleMarketOrders } from "market";
+import { refreshMemoryStructuresOnBuildEvents } from "functions";
 
 profiler.enable()
 
@@ -67,6 +68,7 @@ export const loop = function () {
 
             // Automatically delete memory of missing creeps
             cleanUpMemory();
+            refreshMemoryStructuresOnBuildEvents()
 
             Memory["map"] = {}
 
