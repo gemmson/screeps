@@ -39,13 +39,14 @@ export const handleMarketOrders = registerFNProfiler(function handleMarketOrders
             order.resourceType == resource
             && order.type == ORDER_BUY
             && order.roomName != undefined
-            && Game.market.calcTransactionCost(200, room.name, order.roomName) < 400
+            && order.price >= 0.95
+            && Game.market.calcTransactionCost(400, room.name, order.roomName) < 800
         )
         if (orders.length > 0) {
             orders = _.sortByOrder(orders, (o) => o.price, "desc")
             const bestOrder = orders[0]
             //console.log(`Trying to fulfill buy order for ${resource} at price: ${bestOrder.price}`)
-            const result = Game.market.deal(bestOrder.id, 200, room.name)
+            const result = Game.market.deal(bestOrder.id, 400, room.name)
             if (result == OK) {
                 console.log(`Order for ${bestOrder.resourceType} completed successfully in room ${room.name}. Order room ${bestOrder.roomName}`)
             }

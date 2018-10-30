@@ -94,7 +94,7 @@ export function runScreepsRoles() {
 
 const minNumberOfHarvesters = 2;
 const minNumberOfUpgraders = 1;
-const minNumberOfBuilders = 1;
+const minNumberOfBuilders = 2;
 const minNumberOfTowerKeepers = 1
 const minNumberOfRepairers = 1;
 const minNumberOfWallRepairers = 1
