@@ -69,7 +69,7 @@ export class SummoningCircle implements ISummoningCircle {
             }
         }
         if (this.memory.spawners.length == 0 || Game.time % 100 == 0) {
-            console.log(`Binding new objects for summoning circle in ${this.room.name}`)
+            //console.log(`Binding new objects for summoning circle in ${this.room.name}`)
             const spawners: ISummoningCircleSpawner[] = []
             const spawns = this.heart.pos.findInRange(FIND_MY_SPAWNS, 2)
             if (spawns.length > 0) {
@@ -165,9 +165,9 @@ export class SummoningCircle implements ISummoningCircle {
 
 export function manageSummons() {
     for (const roomName in Game.rooms) {
-        if (roomName != "sim") {
-            return
-        }
+        // if (roomName != "sim") {
+        //     return
+        // }
         if (SummoningCircle.summoningHeartExistInRoom(roomName)) {
             const summoningCircle = new SummoningCircle(roomName)
             summoningCircle.bindObjects()

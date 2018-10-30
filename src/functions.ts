@@ -62,7 +62,7 @@ export const numberOfCreepsInRole = function numberOfCreepsInRole(role: string, 
     return _.sum(Game.creeps, (c) => (c.memory.role === role && (!room || c.memory.room == room)) ? 1 : 0);
 }
 
-export const createCustomCreep = function createCustomCreep(energy: number, role: string, roomName?: string, onlySpawnInTargetRoom?: boolean, maxEnergy?: number): boolean {
+export const createCustomCreep = registerFNProfiler(function createCustomCreep(energy: number, role: string, roomName?: string, onlySpawnInTargetRoom?: boolean, maxEnergy?: number): boolean {
     if (energy < 300) {
         return false
     }
@@ -87,9 +87,9 @@ export const createCustomCreep = function createCustomCreep(energy: number, role
         energyToSpend -= 50;
     }
     return spawnCreep(role, body, roomName, onlySpawnInTargetRoom);
-}
+})
 
-export const spawnCreep = function spawnCreep(role: string, body: BodyPartConstant[], roomName?: string, onlySpawnInTargetRoom?: boolean): boolean {
+export const spawnCreep = registerFNProfiler(function spawnCreep(role: string, body: BodyPartConstant[], roomName?: string, onlySpawnInTargetRoom?: boolean): boolean {
     const energy = bodyCost(body)
     const name = getRandomName(`${roomName ? `${roomName} ` : ''}${role}`);
     let freeSpawners = getFreeSpawners(energy, roomName);
@@ -116,7 +116,7 @@ export const spawnCreep = function spawnCreep(role: string, body: BodyPartConsta
         }
     }
     return false
-}
+})
 
 export function getMyUsername(): string {
     for (var spawnName in Game.spawns) {
@@ -134,7 +134,7 @@ export function bodyCost(body: BodyPartConstant[]) {
     }, 0);
 }
 
-const getFreeSpawners = function getFreeSpawners(energy: number, roomName?: string): StructureSpawn[] {
+const getFreeSpawners = registerFNProfiler(function getFreeSpawners(energy: number, roomName?: string): StructureSpawn[] {
     let freeSpawners = _.filter(Game.spawns, (s) => !s.spawning
         && !Memory["activeSpawners"][s.name]
         && s.room.energyAvailable >= energy
@@ -144,7 +144,7 @@ const getFreeSpawners = function getFreeSpawners(energy: number, roomName?: stri
         return freeSpawners.filter(s => s.room.memory.stats.numberOfTicksWithFullEnergy > 15)
     //freeSpawners = _.sortBy(freeSpawners, (s) => Game.map.getRoomLinearDistance(roomName, s.room.name))
     return freeSpawners
-}
+})
 
 export function manageWorkingState(creep: Creep, debug: boolean) {
     // if (creep.memory['working'] == undefined) {
@@ -414,7 +414,7 @@ Object.defineProperty(Room.prototype, nameof<Room>("structures"), {
                 // doesn't work
                 //this.memory._structureIds = _.filter(Game.structures, s => s.room && s.room.name == self.name).map(structure => structure.id);
             }
-            self._structures = this.memory._structureIds.map((id: string) => Game.getObjectById(id));
+            self._structures = this.memory._structureIds.map((id: string) => Game.getObjectById<AnyStructure>(id)).filter((x: AnyStructure | null) => x != null);
         }
         // return the locally stored value
         return self._structures;
