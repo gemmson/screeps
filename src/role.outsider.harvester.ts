@@ -73,7 +73,7 @@ export class roleOutsiderHarvester {
         //need to build container at this creep pos
         else {
             const structures = creep.room.lookForAtArea(LOOK_STRUCTURES, pos.y - 2, pos.x - 2, pos.y + 2, pos.x + 2, true)
-            const containers = _.filter(structures, (s) => s.structure.structureType == STRUCTURE_CONTAINER)
+            let containers = _.filter(structures, (s) => s.structure.structureType == STRUCTURE_CONTAINER)
             if (containers.length == 0) {
                 // create container site
                 creep.say("creatingContainer")
@@ -81,7 +81,7 @@ export class roleOutsiderHarvester {
             }
             else {
                 // container exists
-                const closestEnergyTarget = containers[0].structure;
+                const closestEnergyTarget = _.min(containers, c => (c.structure as StructureContainer).store.energy).structure
                 if (closestEnergyTarget) {
                     if (closestEnergyTarget.hits < closestEnergyTarget.hitsMax) {
                         if (debug)

@@ -40,7 +40,6 @@ export class roleTowerKeeper {
             if (creep.memory.targetId) {
                 var targetTower = Game.getObjectById(creep.memory.targetId) as StructureTower;
                 if (!targetTower || targetTower.energy == targetTower.energyCapacity) {
-                    creep.memory.working = false;
                     delete creep.memory.targetId;
                     return;
                 }
