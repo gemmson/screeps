@@ -3,8 +3,7 @@ import { goToMemorizedRoom, spawnCreep, registerFNProfiler, goToRoomByName } fro
 export class roleOutsiderEnergyCarrier {
     static role: string = "outsiderEnergyCarrier";
     public static spawn(energy: number, roomName: string) {
-        if (energy < 100) {
-            console.log("Not enough energy to spawn")
+        if (energy < 300) {
             return
         }
         var energyToSpend = energy
@@ -16,6 +15,11 @@ export class roleOutsiderEnergyCarrier {
             energyToSpend -= 50;
             body.push(MOVE)
 
+            if (energyToSpend < 50) {
+                break
+            }
+            energyToSpend -= 50;
+            body.push(CARRY)
             if (energyToSpend < 50) {
                 break
             }

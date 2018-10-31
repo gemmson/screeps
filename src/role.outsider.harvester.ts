@@ -56,17 +56,17 @@ export class roleOutsiderHarvester {
         }
 
         //creep.memory.working = false // debug
-        if (creep.memory.working && creep.carry.energy == 0) {
-            creep.memory.working = false;
-        }
+        // if (creep.memory.working && creep.carry.energy == 0) {
+        //     creep.memory.working = false;
+        // }
         const harvestPower = creep.getHarvestPower()
 
         let status = null;
         const pos = source.pos;
         const constructionSites = creep.room.lookForAtArea(LOOK_CONSTRUCTION_SITES, pos.y - 2, pos.x - 2, pos.y + 2, pos.x + 2, true)
         const containerConstructionSites = _.filter(constructionSites, (s) => s.constructionSite.structureType == STRUCTURE_CONTAINER)
-        if (containerConstructionSites.length > 0) {
-            if (creep.carry.energy / creep.carryCapacity >= 0.5 && creep.build(containerConstructionSites[0].constructionSite) == ERR_NOT_IN_RANGE) {
+        if (containerConstructionSites.length > 0 && creep.carry.energy > 0) {
+            if (creep.build(containerConstructionSites[0].constructionSite) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(containerConstructionSites[0].constructionSite, { reusePath: 20, ignoreRoads: true })
             }
         }
@@ -98,7 +98,8 @@ export class roleOutsiderHarvester {
                 }
             }
         }
-        if (status == OK || (creep.memory.working == false && creep.carry.energy + harvestPower <= creep.carryCapacity)) {
+        //if (status == OK || (creep.memory.working == false && creep.carry.energy + harvestPower <= creep.carryCapacity)) {
+        if (status == OK || (creep.carry.energy + harvestPower <= creep.carryCapacity)) {
             creep.harvest(source);
             // console.log(`status: ${status}`)
         } else {

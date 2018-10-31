@@ -8,7 +8,7 @@ export class roleRanger {
         if (energy < 300) {
             return
         }
-        var energyToSpend = Math.min(energy, maxEnergyForSpawnPerRoom);
+        var energyToSpend = Math.min(energy, 2400);
         var body = Array<BodyPartConstant>();
         while (body.length < 50) {
             if (energyToSpend < 150) {
@@ -23,7 +23,7 @@ export class roleRanger {
             energyToSpend -= 50;
             body.push(MOVE);
         }
-        return spawnCreep(roleRanger.role, _.sortByOrder(body, (s) => s, "desc"), roomName, true)
+        return spawnCreep(roleRanger.role, body, roomName, true)
     }
 
     /** @param {Creep} creep **/

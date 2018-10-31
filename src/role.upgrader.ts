@@ -1,10 +1,10 @@
-import { rechargeAtClosestEnergySource, manageWorkingState, goToMemorizedRoom, createCustomCreep, findClosestNonEmptySourceInRoom, findClosestStorageOrContainer } from "functions";
+import { manageWorkingState, goToMemorizedRoom, createCustomCreep, findClosestNonEmptySourceInRoom, findClosestStorageOrContainer } from "functions";
 import { upgraderRoleName } from "names";
 
 export class roleUpgrader {
     public static role: string = upgraderRoleName
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleUpgrader.role, roomName, true, 3000)
+        createCustomCreep(energy, roleUpgrader.role, roomName, true, 2600)
     }
     /** @param {Creep} creep **/
     public static run(creep: Creep) {

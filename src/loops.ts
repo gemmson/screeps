@@ -19,6 +19,7 @@ import { roleHealer } from 'role.healer';
 import { roleTank } from 'role.tank';
 import { roleSummoner } from 'role.summoner';
 import { roleOutsiderCarrier } from 'role.outsider.carrier';
+import { roleImporter } from 'role.importer';
 
 export function cleanUpMemory() {
     for (const name in Memory.creeps) {
@@ -87,6 +88,9 @@ export function runScreepsRoles() {
         }
         else if (creep.memory.role == roleMiner.role) {
             roleMiner.run(creep)
+        }
+        else if (creep.memory.role == roleImporter.role) {
+            roleImporter.run(creep)
         }
     }
 }
@@ -269,10 +273,16 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 && room.terminal && _.sum(room.terminal.store) - room.terminal.store.energy < room.terminal.storeCapacity / 2) {
                 roleMiner.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (room.storage && room.storage.store.energy > room.storage.storeCapacity / 2 && numberOfCreepsInRole(roleUpgrader.role, roomName) < 8
-                && room.memory.stats.numberOfTicksWithFullEnergy > 50) {
-                roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
+            else if (room.storage && room.storage.store.energy > (room.storage.storeCapacity / 2)) {
+                if (numberOfCreepsInRole(roleImporter.role) < 3) {
+                    roleImporter.spawn(Memory.maxEnergyCapacityInRooms, roomName)
+                }
+                else if (numberOfCreepsInRole(roleUpgrader.role, roomName) < 8
+                    && room.memory.stats.numberOfTicksWithFullEnergy > 50) {
+                    roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
+                }
             }
+
         }
         else {
             // room with no spawner
@@ -288,16 +298,18 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                     // TODO automatic spawner building
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {
                     Memory["map"][roomName] = "reserved"
-                    const numberOfSources = room.sources.length
+
                     var flags = _.map(Game.flags, (s) => s).filter((x) => x && x.name.startsWith("ignore") && x.pos.roomName == roomName)
                     if (Memory.roomsWithStorage.length == 0 || flags.length > 0) {
                         continue
                     }
 
+                    const numberOfSources = room.sources.length
+
                     if (numberOfCreepsInRole(roleOutsiderHarvester.role, roomName) < numberOfSources && Memory.maxEnergyCapacityInRooms) {
                         roleOutsiderHarvester.spawn(Math.min(Memory.maxEnergyCapacityInRooms, 1700), roomName)
                     }
-                    else if (numberOfCreepsInRole(roleOutsiderEnergyCarrier.role, roomName) < numberOfSources * 2 && Memory.maxEnergyCapacityInRooms) {
+                    else if (numberOfCreepsInRole(roleOutsiderEnergyCarrier.role, roomName) < numberOfSources && Memory.maxEnergyCapacityInRooms) {
                         roleOutsiderEnergyCarrier.spawn(Math.min(Memory.maxEnergyCapacityInRooms, 2500), roomName)
                     }
                 }
