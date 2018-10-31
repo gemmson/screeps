@@ -20,6 +20,7 @@ export class roleTowerKeeper {
             creep.memory.working = false;
             if (debug)
                 creep.say('Harvest');
+            delete creep.memory.targetId;
         }
         if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
             creep.memory.working = true;
