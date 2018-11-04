@@ -9,14 +9,14 @@ export class roleRepairer {
     /** @param {Creep} creep **/
     public static run(creep: Creep) {
         var debug = false;
+
+        if (creep.memory.working && creep.carry.energy == 0) {
+            delete creep.memory.targetId
+        }
         manageWorkingState(creep, debug)
 
         if (creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
             rechargeAtClosestEnergySource(creep);
-        }
-
-        if (creep.memory.working && creep.carry.energy == 0) {
-            delete creep.memory.targetId
         }
 
         if (!creep.memory.targetId) {
@@ -24,6 +24,7 @@ export class roleRepairer {
                 filter: (s) =>
                     s.hits < s.hitsMax
                     && s.structureType != STRUCTURE_WALL
+                    && (s.structureType != STRUCTURE_RAMPART || s.structureType == STRUCTURE_RAMPART && s.hits < 5000)
                     && s.structureType != STRUCTURE_CONTROLLER
             }
             );
@@ -34,7 +35,7 @@ export class roleRepairer {
         }
         if (creep.memory.working && creep.memory.targetId) {
             const target = Game.getObjectById(creep.memory.targetId) as Structure | null
-            if (target) {
+            if (target && target.hits < target.hitsMax) {
                 var status = creep.repair(target);
                 if (status == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
@@ -45,7 +46,7 @@ export class roleRepairer {
         }
         else {
             // nothing to repair -> act as builder
-            roleBuilder.run(creep);
+            // roleBuilder.run(creep);
         }
     }
 };
