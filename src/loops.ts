@@ -196,13 +196,17 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                     roleHarvester.spawn(room.energyAvailable, roomName)
             }
             if (numberOfHarvesters < minNumberOfHarvesters) {
-                roleHarvester.spawn(Math.min(room.energyCapacityAvailable, 1000), roomName)
+                //roleHarvester.spawn(Math.min(room.energyCapacityAvailable, 1000), roomName)
+                roleHarvester.spawn(room.energyCapacityAvailable, roomName)
+            }
+            else if (numberOfUpgraders < 1) {
+                roleUpgrader.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfHarvesters >= minNumberOfHarvesters && room.memory.stats.totalHarvestPower < 22 && numberOfHarvesters < room.getNumberOfSpotsNearbySources()) {
                 if (room.memory.stats.numberOfTicksWithoutFullEnergy > 100) {
                     roleHarvester.spawn(room.energyAvailable, roomName)
                 } else {
-                    roleHarvester.spawn(Math.min(room.energyCapacityAvailable, 1000), roomName)
+                    roleHarvester.spawn(room.energyCapacityAvailable, roomName)
                 }
             }
             // else if (room.findStructureOfType<StructureContainer>(STRUCTURE_CONTAINER).length > 0 && numberOfCreepsInRole(roleEnergyCarrier.role, roomName) < 0) {

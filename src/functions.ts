@@ -63,7 +63,7 @@ export const numberOfCreepsInRole = function numberOfCreepsInRole(role: string, 
 }
 
 export const createCustomCreep = registerFNProfiler(function createCustomCreep(energy: number, role: string, roomName?: string, onlySpawnInTargetRoom?: boolean, maxEnergy?: number): boolean {
-    if (energy < 300) {
+    if (energy < 200) {
         return false
     }
     const maxEnergyToSpend = maxEnergy ? maxEnergy : maxEnergyForSpawnPerRoom
