@@ -1,10 +1,11 @@
 import { rechargeAtClosestEnergySource, createCustomCreep, registerFNProfiler } from "functions";
 import { roleRepairer } from "role.repairer";
+import { maxEnergyForSpawnPerRoom } from "consts";
 
 export class roleWallRepairer {
     public static role: string = "wallrepairer"
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleWallRepairer.role, roomName, true)
+        createCustomCreep(energy, roleWallRepairer.role, roomName, true, maxEnergyForSpawnPerRoom)
     }
     /** @param {Creep} creep **/
     public static run(creep: Creep) {

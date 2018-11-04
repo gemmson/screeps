@@ -240,13 +240,13 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 roleTowerKeeper.spawn(room.energyCapacityAvailable, roomName)
             }
             else if (numberOfAttackers < minNumberOfAttackers) {
-                roleAttacker.spawn(room.energyCapacityAvailable, roomName)
+                roleAttacker.spawn(Memory.maxEnergyCapacityInRooms, roomName)
             }
             else if (numberOfRangers < minNumberOfRangers) {
-                roleRanger.spawn(room.energyCapacityAvailable, roomName)
+                roleRanger.spawn(Memory.maxEnergyCapacityInRooms, roomName)
             }
             else if (numberOfHealers < minNumberOfHealers) {//healFlags.length) {
-                roleHealer.spawn(room.energyCapacityAvailable, roomName)
+                roleHealer.spawn(Memory.maxEnergyCapacityInRooms, roomName)
             }
             else if (numberOfTanks < minNumberOfTanks) {// tankFlags.length) {
                 roleTank.spawn(room.energyCapacityAvailable, roomName)
@@ -290,11 +290,11 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             if (room.controller) {
                 if (room.controller.my) {
                     Memory["map"][roomName] = "my without spawner"
-                    if (numberOfCreepsInRole(roleBuilder.role, roomName) < 2 && Memory.maxEnergyCapacityInRooms) {
-                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleBuilder.role, roomName, false, maxEnergyForSpawnPerRoom)
+                    if (numberOfCreepsInRole(roleBuilder.role, roomName) < 2) {
+                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleBuilder.role, roomName, false, Memory.maxEnergyCapacityInRooms)
                     }
-                    else if (numberOfCreepsInRole(roleUpgrader.role, roomName) < minNumberOfUpgraders && Memory.maxEnergyCapacityInRooms) {
-                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleUpgrader.role, roomName, false, maxEnergyForSpawnPerRoom)
+                    else if (numberOfCreepsInRole(roleUpgrader.role, roomName) < 1) {
+                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleUpgrader.role, roomName, false)
                     }
                     // TODO automatic spawner building
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {

@@ -85,7 +85,7 @@ export class roleHealer {
                 creep.rangedHeal(woundedCreep)
             }
             if (rangeToTarget > 0) {
-                creep.moveTo(woundedCreep, { visualizePathStyle: { stroke: '#00ffff' } })
+                creep.moveTo(woundedCreep, { maxRooms: 1, visualizePathStyle: { stroke: '#00ffff' } })
             }
         } else {
             creep.memory.working = false

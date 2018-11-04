@@ -104,9 +104,9 @@ export const spawnCreep = registerFNProfiler(function spawnCreep(role: string, b
             directions: freeSpawners[0].memory.allowedDirections
         })
         if (status == OK) {
-            let spawnName = freeSpawners[0].room.name
-            Memory["activeSpawners"] = { [spawnName]: true }
-            console.log(`### Spawned ${name} creep with energy: ${energy} using spawner: ${freeSpawners[0].name} ###`);
+            let spawnRoomName = freeSpawners[0].room.name
+            Memory["activeSpawners"] = { [spawnRoomName]: true }
+            console.log(`### Spawned ${name} creep with energy: ${energy} using spawner: ${freeSpawners[0].name} in ${spawnRoomName} ###`);
             freeSpawners[0].room.memory.stats.numberOfTicksWithoutFullEnergy = 0;
             return true
         }

@@ -38,9 +38,9 @@ export class roleBuilder {
                     creep.moveTo(source, { reusePath: 15, maxOps: 1500, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined })
                 }
             }
-            else if (Game.time % 5 == 0) { //prevent camping close to source blocking way
-                creep.moveInRandomDirection()
-            }
+            // else if (Game.time % 5 == 0) { //prevent camping close to source blocking way
+            //     creep.moveInRandomDirection()
+            // }
         } else {
             var priorityFlags = _.filter(Game.flags, f => f.name.startsWith("prio"))
             var allSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);

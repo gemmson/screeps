@@ -66,7 +66,7 @@ export class roleAttacker {
         //TODO cache structures
         var enemyBuildings = creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: (s) => !Memory.allies.includes(s.owner.username) && s.structureType == STRUCTURE_SPAWN || s.structureType == STRUCTURE_TOWER })
         if (enemyBuildings.length > 0 && creep.room.controller && !creep.room.controller.safeMode) {
-            const closestTower = _.find(enemyBuildings, s => s.structureType == STRUCTURE_TOWER)
+            const closestTower = _.find(enemyBuildings, s => s.structureType == STRUCTURE_SPAWN)
             if (closestTower) {
                 creep.memory.targetId = closestTower.id
             }

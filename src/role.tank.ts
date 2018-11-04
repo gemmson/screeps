@@ -10,10 +10,10 @@ export class roleTank {
     public static role: string = "tank"
 
     public static spawn(energy: number, roomName: string) {
-        if (energy < 300) {
+        if (energy < 1500) {
             return
         }
-        var energyToSpend = Math.min(energy, maxEnergyForSpawnPerRoom);
+        var energyToSpend = Math.min(energy, 1500);
         var body = Array<BodyPartConstant>();
         while (body.length < 50) {
             if (energyToSpend < 150) {
