@@ -4,7 +4,7 @@ import { rechargeAtClosestEnergySource, manageWorkingState, goToMemorizedRoom, c
 export class roleBuilder {
     public static role: string = "builder"
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleBuilder.role, roomName, true, 2600)
+        createCustomCreep(energy, roleBuilder.role, roomName, true, 2800)
     }
     /** @param {Creep} creep **/
     public static run(creep: Creep) {
