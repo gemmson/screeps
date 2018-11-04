@@ -24,7 +24,7 @@ export class roleBuilder {
             const droppedResourceEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY });
             if (droppedResourceEnergy && creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
                 if (creep.pickup(droppedResourceEnergy) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1500, visualizePathStyle: { stroke: '#ffffff' } });
+                    creep.moveTo(droppedResourceEnergy, { maxRooms: 1, reusePath: 10, maxOps: 1500, visualizePathStyle: { stroke: '#ffffff' } });
                 }
                 return;
             }
@@ -35,7 +35,7 @@ export class roleBuilder {
                 }
                 const status = creep.harvest(source)
                 if (status == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, { reusePath: 15, maxOps: 1500, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined })
+                    creep.moveTo(source, { maxRooms: 1, reusePath: 15, maxOps: 1500, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined })
                 }
             }
             // else if (Game.time % 5 == 0) { //prevent camping close to source blocking way
@@ -86,7 +86,7 @@ export class roleBuilder {
                 if (target) {
                     if ("progress" in target && target.progress < target.progressTotal) {
                         if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(target, { range: 3, reusePath: 10, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
+                            creep.moveTo(target, { maxRooms: 1, range: 3, reusePath: 10, maxOps: 1700, visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined });
                         }
                     }
                 }

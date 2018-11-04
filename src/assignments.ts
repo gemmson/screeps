@@ -20,7 +20,7 @@ function removeDeadAssignments() {
 function assignSourcesToHarvesters() {
     for (const roomName in Game.rooms) {
         const room = Game.rooms[roomName];
-        const sources = room.find(FIND_SOURCES)
+        const sources = room.sources
         const harvesters = room.find(FIND_MY_CREEPS, { filter: (c) => c.memory.role == roleHarvester.role && !c.memory.targetId })
         harvesters.forEach((creep) => {
             for (let i = 0; i < sources.length; i++) {
