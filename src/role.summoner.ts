@@ -25,19 +25,18 @@ export class roleSummoner {
 
         let busy = false
         if (creep.carry.energy > 0) {
-            if (spawn && spawn.energy < spawn.energyCapacity && spawn.id != energySource.id) {
+            const extensionsToFill = extensions.filter(e => e.energy < e.energyCapacity)
+            if (extensionsToFill.length > 0) {
+                if (debug)
+                    creep.say("Transfer")
+                creep.transfer(extensionsToFill[0], RESOURCE_ENERGY)
+                busy = true
+            }
+            else if (spawn && spawn.energy < spawn.energyCapacity && spawn.id != energySource.id) {
                 if (debug)
                     creep.say("Transfer")
                 creep.transfer(spawn, RESOURCE_ENERGY)
                 busy = true
-            } else {
-                const extensionsToFill = extensions.filter(e => e.energy < e.energyCapacity)
-                if (extensionsToFill.length > 0) {
-                    if (debug)
-                        creep.say("Transfer")
-                    creep.transfer(extensionsToFill[0], RESOURCE_ENERGY)
-                    busy = true
-                }
             }
         }
         if (!busy) {

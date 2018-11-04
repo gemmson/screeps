@@ -291,10 +291,10 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                 if (room.controller.my) {
                     Memory["map"][roomName] = "my without spawner"
                     if (numberOfCreepsInRole(roleBuilder.role, roomName) < 2) {
-                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleBuilder.role, roomName, false, Memory.maxEnergyCapacityInRooms)
+                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleBuilder.role, roomName, false, 3000)
                     }
                     else if (numberOfCreepsInRole(roleUpgrader.role, roomName) < 1) {
-                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleUpgrader.role, roomName, false)
+                        createCustomCreep(Memory.maxEnergyCapacityInRooms, roleUpgrader.role, roomName, false, maxEnergyForSpawnPerRoom)
                     }
                     // TODO automatic spawner building
                 } else if (room.controller.reservation && room.controller.reservation.username == getMyUsername()) {

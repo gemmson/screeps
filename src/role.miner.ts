@@ -3,7 +3,7 @@ import { goToMemorizedRoom, createCustomCreep } from "functions";
 export class roleMiner {
     public static role: string = "miner"
     public static spawn(energy: number, roomName?: string) {
-        createCustomCreep(energy, roleMiner.role, roomName, true, 1600)
+        createCustomCreep(energy, roleMiner.role, roomName, true, 2400)
     }
     public static run(creep: Creep) {
         var debug = false
