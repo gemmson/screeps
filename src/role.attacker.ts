@@ -8,7 +8,7 @@ export class roleAttacker {
         if (energy < 300) {
             return
         }
-        var energyToSpend = Math.min(energy, maxEnergyForSpawnPerRoom);
+        var energyToSpend = energy // Math.min(energy, maxEnergyForSpawnPerRoom);
         var body = Array<BodyPartConstant>();
         // body.push(TOUGH)
         // body.push(TOUGH)
