@@ -97,7 +97,7 @@ export function runScreepsRoles() {
 
 
 const minNumberOfHarvesters = 2;
-const minNumberOfUpgraders = 1;
+let minNumberOfUpgraders = 1;
 const minNumberOfBuilders = 2;
 const minNumberOfTowerKeepers = 1
 const minNumberOfRepairers = 1;
@@ -143,6 +143,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
 
         room.calculateStats();
         let visualCurrentLine = 0
+        minNumberOfUpgraders = room.controller && room.controller.level < 4 ? 3 : 1
         room.visual.text(`Energy: ${room.energyAvailable}/${room.energyCapacityAvailable}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`# of ticks at full/not full energy: ${room.memory.stats.numberOfTicksWithFullEnergy}/${room.memory.stats.numberOfTicksWithoutFullEnergy}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`harvester power: ${room.memory.stats.totalHarvestPower}`, 0, visualCurrentLine++, { align: 'left' })
@@ -262,7 +263,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             else if ((!room.controller.safeMode || room.controller.safeMode < 100) && defenderCreep && defenderCreep[0] && defenderCreep[0].ticksToLive && (defenderCreep[0].ticksToLive as number) < 200 && numberOfCreepsInRole(roleDefender.role, roomName) <= minimumNumberOfDefenders - towers.length) {
                 roleDefender.spawn(room.energyCapacityAvailable, roomName)
             }
-            else if (structures.some(s => s.structureType == STRUCTURE_WALL)
+            else if (structures.some(s => (s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART) && s.hits < NUKE_DAMAGE[0] + 1000000)
                 && (room.controller.level > 2 || room.memory.stats.numberOfTicksWithFullEnergy > 15)
                 && numberOfCreepsInRole(roleWallRepairer.role, roomName) < minNumberOfWallRepairers) {
                 roleWallRepairer.spawn(room.energyCapacityAvailable, roomName)
