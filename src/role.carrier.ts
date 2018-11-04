@@ -47,7 +47,7 @@ export class roleCarrier {
         }
 
         // maybe disable that for cpu
-        const droppedResourceEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY && s.amount > 200 });
+        const droppedResourceEnergy = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY && s.amount > 200 });
         if (droppedResourceEnergy && creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
             if (creep.pickup(droppedResourceEnergy) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1700, maxRooms: 1, visualizePathStyle: { stroke: '#ffffff' } });
@@ -60,7 +60,7 @@ export class roleCarrier {
                 // find target
                 const tombstones = creep.room.find(FIND_TOMBSTONES, { filter: (s) => _.sum(s.store) > 0 })
                 if (tombstones.length > 0) {
-                    let closestTombstone = creep.pos.findClosestByRange(tombstones)
+                    let closestTombstone = creep.pos.findClosestByPath(tombstones)
                     closestTombstone = closestTombstone ? closestTombstone : tombstones[0]
                     creep.memory.data = closestTombstone.id
                 } else {
