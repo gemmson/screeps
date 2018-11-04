@@ -20,11 +20,11 @@ export class roleOutsiderEnergyCarrier {
             }
             energyToSpend -= 50;
             body.push(CARRY)
-            if (energyToSpend < 50) {
-                break
-            }
-            energyToSpend -= 50;
-            body.push(CARRY)
+            // if (energyToSpend < 50) {
+            //     break
+            // }
+            // energyToSpend -= 50;
+            // body.push(CARRY)
         }
         spawnCreep(roleOutsiderEnergyCarrier.role, body, roomName)
     }
