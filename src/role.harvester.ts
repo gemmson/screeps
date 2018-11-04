@@ -7,7 +7,7 @@ export class roleHarvester {
     public static role: string = harvesterRoleName
     public static spawn(energy: number, roomName: string): boolean {
         const room = Game.rooms[roomName]
-        if (room && room.memory.stats.numberOfCarriers > 0) {
+        if (room && room.memory.stats.numberOfCarriers > 0 && energy >= 950) {
             return roleHarvester.spawnSpecializedHarvester(energy, roomName)
         }
         return createCustomCreep(energy, roleHarvester.role, roomName, true, 1400)
@@ -135,34 +135,27 @@ export class roleHarvester {
     }
 
     private static spawnSpecializedHarvester(energy: number, roomName: string): boolean {
-        if (energy < 300) {
+        if (energy < 950) {
             return false
         }
-        var energyToSpend = Math.min(energy, 1600);
-        var body = new Array<BodyPartConstant>();
-        energyToSpend -= 50
-        body.push(MOVE)
-        energyToSpend -= 50
-        body.push(CARRY)
-        energyToSpend -= 100
-        body.push(WORK)
-        energyToSpend -= 100
-        body.push(WORK)
-        var numberOfBodyParts = Math.floor(energyToSpend / 250) // 200=Work x2 + 50 move
 
-        for (let i = 0; i < numberOfBodyParts; i++) {
-            body.push(WORK)
-            body.push(WORK)
-            body.push(MOVE)
-            energyToSpend -= 250
-        }
-        while (body.length < 50) {
-            if (energyToSpend < 50) {
-                break
-            }
-            energyToSpend -= 50;
-            body.push(MOVE)
-        }
+        var body = new Array<BodyPartConstant>();
+        body.push(MOVE)
+        body.push(CARRY)
+        body.push(WORK)
+        body.push(WORK)
+
+        body.push(WORK)
+        body.push(WORK)
+        body.push(MOVE)
+
+        body.push(WORK)
+        body.push(WORK)
+        body.push(MOVE)
+
+        body.push(WORK)
+        body.push(MOVE)
+
         return spawnCreep(roleHarvester.role, body.reverse(), roomName, true)
     }
 };
