@@ -50,7 +50,7 @@ export class roleCarrier {
         const droppedResourceEnergy = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: (s) => s.resourceType == RESOURCE_ENERGY && s.amount > 200 });
         if (droppedResourceEnergy && creep.memory.working == false && creep.carry.energy < creep.carryCapacity) {
             if (creep.pickup(droppedResourceEnergy) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1700, visualizePathStyle: { stroke: '#ffffff' } });
+                creep.moveTo(droppedResourceEnergy, { reusePath: 10, maxOps: 1700, maxRooms: 1, visualizePathStyle: { stroke: '#ffffff' } });
             }
             return;
         }
@@ -113,7 +113,7 @@ export class roleCarrier {
                 if (resource) {
                     const status = creep.withdraw(container, resource)
                     if (status == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                        creep.moveTo(container, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700, maxRooms: 1 });
                     }
                 } else { // no more resources, find another target
                     delete creep.memory.data
@@ -129,7 +129,7 @@ export class roleCarrier {
 
                 const status = creep.withdraw(linkOrStorage, RESOURCE_ENERGY)
                 if (status == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(linkOrStorage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                    creep.moveTo(linkOrStorage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700, maxRooms: 1 });
                 }
             }
         }
@@ -162,7 +162,7 @@ export class roleCarrier {
                 if (closestNonEmptyDeposit && creep.carry.energy > 0) {
                     const status = creep.transfer(closestNonEmptyDeposit, RESOURCE_ENERGY)
                     if (status == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(closestNonEmptyDeposit, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                        creep.moveTo(closestNonEmptyDeposit, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700, maxRooms: 1 });
                     }
                     return
                 }
@@ -174,7 +174,7 @@ export class roleCarrier {
                     if (resource) {
                         const status = creep.transfer(storage, resource)
                         if (status == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(storage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700 });
+                            creep.moveTo(storage, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1700, maxRooms: 1 });
                         }
                     }
                 }
