@@ -19,12 +19,13 @@ interface CreepMemoryInternal {
 }
 
 interface Memory {
-  uuid: number;
-  log: any;
-  roomsWithStorage: Array<string>;
-  links: Link;
-  assignments: Assignment;
-  map: RoomMap;
+  uuid: number
+  log: any
+  roomsWithStorage: Array<string>
+  links: Link
+  assignments: Assignment
+  map: RoomMap
+  warMap: WarMap
   maxEnergyCapacityInRooms: number
   allies: string[]
   marketDisabled: boolean
@@ -32,6 +33,12 @@ interface Memory {
 
 interface RoomMap {
   [name: string]: string
+}
+
+interface WarMap {
+  [name: string]: {
+    attackControllerMinimalTick: number
+  }
 }
 
 interface Link {

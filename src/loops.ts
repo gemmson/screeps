@@ -20,6 +20,7 @@ import { roleTank } from 'role.tank';
 import { roleSummoner } from 'role.summoner';
 import { roleOutsiderCarrier } from 'role.outsider.carrier';
 import { roleImporter } from 'role.importer';
+import { roleControllerDestroyer } from 'role.controller.destroyer';
 
 export function cleanUpMemory() {
     for (const name in Memory.creeps) {
@@ -92,6 +93,9 @@ export function runScreepsRoles() {
         else if (creep.memory.role == roleImporter.role) {
             roleImporter.run(creep)
         }
+        else if (creep.memory.role == roleControllerDestroyer.role) {
+            roleControllerDestroyer.run(creep)
+        }
     }
 }
 
@@ -147,7 +151,6 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
         room.visual.text(`Energy: ${room.energyAvailable}/${room.energyCapacityAvailable}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`# of ticks at full/not full energy: ${room.memory.stats.numberOfTicksWithFullEnergy}/${room.memory.stats.numberOfTicksWithoutFullEnergy}`, 0, visualCurrentLine++, { align: 'left' })
         room.visual.text(`harvester power: ${room.memory.stats.totalHarvestPower}`, 0, visualCurrentLine++, { align: 'left' })
-        room.visual.text(`number of creeps ${room.memory.stats.numberOfCreeps}`, 0, visualCurrentLine++, { align: 'left' })
 
         if (room.storage) {
             Memory["roomsWithStorage"].push(roomName)
@@ -234,7 +237,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             }
             else if (room.find(FIND_MY_CONSTRUCTION_SITES).length > 0
                 && (numberOfCreepsInRole(roleBuilder.role, roomName) < minNumberOfBuilders
-                    || ((true || !_.contains(Memory.roomsWithStorage, room.name) || (room.storage != undefined && ((room.storage) as StructureStorage).store.energy > 100000))
+                    || ((room.storage != undefined && room.storage.store.energy > 100000)
                         && room.memory.stats.numberOfTicksWithFullEnergy > numberOfBuilders * numberOfTicksWithFullEnergyPerUpgrader + 20
                         && numberOfBuilders < 4))) {
                 roleBuilder.spawn(room.energyCapacityAvailable, roomName)
@@ -321,7 +324,7 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
             }
         }
     }
-
+    // spawn globally
     let claimFlag = Game.flags["claim"]
     if (claimFlag) {
         const claimers = _.filter(Game.creeps, (c) => c.memory.role == roleOutsiderClaimer.role)
@@ -340,6 +343,18 @@ export const manageSpawning = registerFNProfiler(function manageSpawning() {
                     continue
                 }
                 roleOutsiderReserver.spawn(flag.pos.roomName, Memory.maxEnergyCapacityInRooms)
+            }
+        } else if (flagName.startsWith("destroy")) {
+            const flag = Game.flags[flagName]
+            const destroyers = _.filter(Game.creeps, (c) => c.memory.role == roleControllerDestroyer.role && c.memory.room == flag.pos.roomName)
+            if (destroyers.length == 0 && (Memory.warMap == undefined || Memory.warMap[flag.pos.roomName] == undefined || Memory.warMap[flag.pos.roomName].attackControllerMinimalTick <= Game.time)) {
+                roleControllerDestroyer.spawn(flag.pos.roomName, Memory.maxEnergyCapacityInRooms)
+            }
+            for (let roomName in Memory.warMap) {
+                if (Memory.warMap[roomName].attackControllerMinimalTick < Game.time) {
+                    console.log(`Deleting war map for room ${roomName}`)
+                    delete Memory.warMap[roomName]
+                }
             }
         }
     }

@@ -4,16 +4,14 @@ export class roleOutsiderReserver {
     static role: string = "outsiderReserver";
     static sign: string = "Room reserved for Gemm💎"
     public static spawn(roomName: string, energy: number) {
-        if (energy < 300) {
+        if (energy < 1300) {
             return
         }
         var body = [] as any;
         body.push(MOVE)
         body.push(CLAIM)
-        if (energy >= 600) {
-            body.push(MOVE)
-            body.push(CLAIM)
-        }
+        body.push(CLAIM)
+        body.push(MOVE)
 
         spawnCreep(roleOutsiderReserver.role, body, roomName)
     }
