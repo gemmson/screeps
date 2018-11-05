@@ -11,6 +11,8 @@ export class roleRepairer {
     public static run(creep: Creep) {
         var debug = false;
 
+        creep.say("Repair")
+
         if (creep.memory.working && creep.carry.energy == 0) {
             delete creep.memory.targetId
         }

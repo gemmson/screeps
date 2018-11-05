@@ -33,8 +33,8 @@ export class roleTowerKeeper {
         else {
             if (!creep.memory.targetId) {
                 var towers = creep.room.find(FIND_MY_STRUCTURES, { filter: (s) => s.structureType == STRUCTURE_TOWER && s.energy < s.energyCapacity }) as StructureTower[];
-                towers.sort((a, b) => a.energy - b.energy);
                 if (towers.length > 0) {
+                    towers.sort((a, b) => a.energy - b.energy);
                     creep.memory.targetId = towers[0].id
                 }
             }
@@ -48,9 +48,10 @@ export class roleTowerKeeper {
                     creep.moveTo(targetTower, { visualizePathStyle: debug ? { stroke: '#ffffff' } : undefined, reusePath: 15, maxOps: 1500, maxRooms: 1 });
                 }
             }
-            else if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) }).length == 0) {
-                roleRepairer.run(creep)
-            }
+            // needs fix for constant switching between roles and deleting targetId
+            // else if (creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => !Memory.allies.includes(c.owner.username) }).length == 0) {
+            //     roleRepairer.run(creep)
+            // }
         }
     }
 };
