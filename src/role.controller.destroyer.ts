@@ -55,6 +55,10 @@ export class roleControllerDestroyer {
             // find my closest room
             if (!goToRoomByName(creep, creep.memory.homeRoom)) {
                 //in home room, suicide to save some energy or die trying!
+                if (creep.room.storage && !creep.pos.isNearTo(creep.room.storage)) {
+                    creep.moveTo(creep.room.storage)
+                    return
+                }
                 creep.suicide()
             }
         }
